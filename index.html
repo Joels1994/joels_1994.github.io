@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jo — Electrical Engineering, IIT Gandhinagar</title>
+  <title>Joel S. — Electrical Engineering, IIT Gandhinagar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
@@ -79,7 +79,6 @@
       align-items: start;
       max-width: 780px;
     }
-    .hero-text {}
     .hero-label {
       font-family: var(--font-mono);
       font-size: 0.7rem;
@@ -134,11 +133,6 @@
       background: var(--light);
       border: 1px solid var(--rule);
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      color: var(--muted);
-      text-align: center;
-      letter-spacing: 0.05em;
       overflow: hidden;
     }
     .avatar svg { width: 48px; height: 48px; color: var(--muted); }
@@ -155,7 +149,6 @@
 
     /* ── RESEARCH ── */
     .research-grid { display: flex; flex-direction: column; gap: 2.5rem; }
-    .research-item {}
     .research-item h3 {
       font-size: 1.1rem;
       font-weight: 500;
@@ -204,24 +197,19 @@
       color: var(--muted);
       font-style: italic;
     }
-    .pub-link {
+    .pub-section-heading {
       font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.08em;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--ink);
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 0.5rem;
+      color: var(--muted);
+      margin: 2.5rem 0 1.2rem;
       border-bottom: 1px solid var(--rule);
-      padding-bottom: 1px;
-      transition: border-color 0.2s;
+      padding-bottom: 0.5rem;
     }
-    .pub-link:hover { border-color: var(--ink); }
 
     /* ── CONTACT ── */
     .contact-body { font-size: 1rem; color: var(--muted); max-width: 480px; }
-    .contact-body a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
     .contact-items {
       margin-top: 2rem;
       display: flex; flex-direction: column; gap: 0.8rem;
@@ -276,7 +264,7 @@
 <body>
 
   <nav>
-    <a href="#about" class="nav-name">Jo</a>
+    <a href="#about" class="nav-name">Joel S.</a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#research">Research</a></li>
@@ -291,17 +279,19 @@
     <section id="about">
       <div class="hero-text">
         <p class="hero-label">PhD Candidate · IIT Gandhinagar</p>
-        <h1>Jo<br><em>Signal Processing<br>&amp; Spatial Audio</em></h1>
+        <h1>Joel S.<br><em>Signal Processing<br>&amp; Spatial Audio</em></h1>
         <p class="hero-bio">
-          I am a PhD candidate in Electrical Engineering at IIT Gandhinagar, working under
-          Prof. Nithin V. George. My research focuses on adaptive direction-of-arrival estimation
-          and region-of-interest beamforming using microphone array systems. I have also collaborated
-          with Prof. Israel Cohen at Technion through a Viterbi Fellowship.
+          I am a PhD candidate in Electrical Engineering at IIT Gandhinagar (GPA: 9.58/10),
+          working under Prof. Nithin V. George. My research spans adaptive beamforming,
+          direction-of-arrival estimation, and spatial audio processing for microphone array systems.
+          I was a Visiting Research Fellow at Technion – Israel Institute of Technology,
+          supported by the Viterbi Fellowship, collaborating with Prof. Israel Cohen on
+          time-domain region-of-interest beamforming.
         </p>
         <div class="hero-links">
           <a href="#publications" class="btn primary">Publications</a>
           <a href="#contact" class="btn">Contact</a>
-          <a href="#" class="btn">CV ↗</a>
+          <a href="https://scholar.google.com" target="_blank" class="btn">Google Scholar ↗</a>
         </div>
       </div>
       <div class="avatar-wrap">
@@ -322,41 +312,70 @@
         <div class="research-item">
           <div>
             <span class="tag">DOA Estimation</span>
-            <span class="tag">Deep Unfolding</span>
+            <span class="tag">Coarray</span>
+            <span class="tag">Adaptive Filtering</span>
           </div>
-          <h3>Adaptive DOA Estimation via Spherical Microphone Arrays</h3>
+          <h3>Adaptive Underdetermined DOA Estimation</h3>
           <p>
-            Developing a deep unfolding framework for direction-of-arrival estimation
-            using spherical harmonic domain representations. The approach integrates
-            algorithm-specific prior knowledge into a trainable network structure with
-            per-layer parameters, targeting IEEE Transactions on Signal Processing.
+            Developed the Coarray LMS algorithm, capable of resolving more sources than physical
+            sensors. Introduced a polynomial-rooting method for efficient spectral peak localization
+            and an integrated covariance matrix error removal strategy for improved accuracy.
           </p>
         </div>
 
         <div class="research-item">
           <div>
             <span class="tag">Beamforming</span>
+            <span class="tag">ROI</span>
             <span class="tag">Spatial Audio</span>
           </div>
           <h3>Region-of-Interest Beamforming</h3>
           <p>
-            Design and analysis of adaptive beamformers for flexible spatial region
-            selection, with applications to immersive audio capture and acoustic
-            scene analysis. Includes real-time implementation on Speedgoat hardware
-            and evaluation with Neumann KU100 binaural microphones.
+            Developed a generalized sidelobe canceller framework for time-domain region-of-interest
+            beamforming, enabling flexible spatial region selection for immersive audio capture.
+            Work conducted in collaboration with Technion – Israel Institute of Technology.
           </p>
         </div>
 
         <div class="research-item">
           <div>
-            <span class="tag">Adaptive Filters</span>
-            <span class="tag">LMS / NLMS / RLS</span>
+            <span class="tag">Low-Rank</span>
+            <span class="tag">Kronecker</span>
+            <span class="tag">NLMS / RLS</span>
           </div>
-          <h3>Adaptive Algorithm Design</h3>
+          <h3>Low-Rank Adaptive DOA Estimation</h3>
           <p>
-            Investigation of variable step-size adaptive filtering strategies including
-            DVSS-NLMS and LMP-LMS frameworks for acoustic echo cancellation and
-            active noise control in reverberant environments.
+            Proposed adaptive DOA estimation algorithms using complex Kronecker product decomposition,
+            enabling parallel adaptive updates via NLMS and RLS for faster convergence and reduced
+            computational complexity in large-scale sensor arrays.
+          </p>
+        </div>
+
+        <div class="research-item">
+          <div>
+            <span class="tag">Fourier Domain</span>
+            <span class="tag">Complex LMS</span>
+            <span class="tag">Sparsity</span>
+          </div>
+          <h3>Fourier-Domain Adaptive DOA Estimation</h3>
+          <p>
+            Designed a family of Fourier-domain complex least square and fourth-order algorithms
+            for efficient adaptive direction-of-arrival estimation, with sparsity-constrained
+            variants using a variable penalty factor for improved resolution.
+          </p>
+        </div>
+
+        <div class="research-item">
+          <div>
+            <span class="tag">LEO Satellite</span>
+            <span class="tag">Geolocation</span>
+            <span class="tag">Planar Array</span>
+          </div>
+          <h3>Ground-Based Source Localization via LEO Satellite</h3>
+          <p>
+            In collaboration with the Space Applications Centre, Ahmedabad — developed algorithms
+            to estimate the geolocation of ground emitters using signals captured by planar arrays
+            onboard low Earth orbit satellites.
           </p>
         </div>
 
@@ -366,25 +385,85 @@
     <!-- PUBLICATIONS -->
     <section id="publications">
       <p class="section-label">Publications</p>
+
+      <p class="pub-section-heading">Journal Articles</p>
       <div class="pub-list">
 
         <div class="pub-item">
-          <p class="pub-venue">IEEE Transactions on Signal Processing · Under Preparation</p>
-          <p class="pub-title">Deep Unfolding for Adaptive DOA Estimation with Spherical Microphone Arrays</p>
-          <p class="pub-authors">Jo, N. V. George</p>
+          <p class="pub-venue">IEEE/ACM Trans. Audio, Speech and Language Processing · In Press, 2026</p>
+          <p class="pub-title">Generalized Sidelobe Canceller for Time-Domain Region-of-Interest Beamforming</p>
+          <p class="pub-authors">S. Joel, Ariel Frank, Israel Cohen, N. V. George</p>
         </div>
 
         <div class="pub-item">
-          <p class="pub-venue">PhD Thesis · IIT Gandhinagar</p>
-          <p class="pub-title">Adaptive DOA Estimation and Region-of-Interest Beamforming Using Microphone Array Systems</p>
-          <p class="pub-authors">Jo · Supervisor: Prof. Nithin V. George</p>
+          <p class="pub-venue">IEEE Transactions on Vehicular Technology · 2025</p>
+          <p class="pub-title">Integrated Approach for Efficient Adaptive Underdetermined DOA Estimation: Coarray LMS with Covariance Matrix Error Removal</p>
+          <p class="pub-authors">S. Joel, S. K. Yadav, N. V. George</p>
         </div>
 
         <div class="pub-item">
-          <p class="pub-venue">Collaboration · Technion, Israel</p>
-          <p class="pub-title">Research in Acoustic Signal Processing</p>
-          <p class="pub-authors">Jo, I. Cohen · Viterbi Fellowship</p>
-          <a href="#" class="pub-link">Details →</a>
+          <p class="pub-venue">IEEE Transactions on Vehicular Technology · 2025</p>
+          <p class="pub-title">A Family of Fourier Domain Complex Least Square/Fourth Algorithms for Efficient Adaptive Direction of Arrival Estimation</p>
+          <p class="pub-authors">S. Joel, S. K. Yadav, M.L.N.S Karthik, N. V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">IEEE Transactions on Vehicular Technology · 2025</p>
+          <p class="pub-title">Adaptive Direction of Arrival Estimation using Sparsity Constrained Complex NLMS Algorithm with Variable Penalty Factor</p>
+          <p class="pub-authors">S. Joel, M.L.N.S Karthik, S. K. Yadav, N. V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">IEEE Transactions on Vehicular Technology · 2024</p>
+          <p class="pub-title">Adaptive Low-Rank DOA Estimation using Complex Kronecker Product Decomposition</p>
+          <p class="pub-authors">S. Joel, S. K. Yadav, N. V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">IEEE Signal Processing Letters · Vol. 31, pp. 591–595, Feb 2024</p>
+          <p class="pub-title">Coarray LMS: Adaptive Underdetermined DOA Estimation With Increased Degrees of Freedom</p>
+          <p class="pub-authors">S. Joel, S. K. Yadav, N. V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">IEEE/ACM Trans. Audio, Speech and Language Processing · 2024</p>
+          <p class="pub-title">FxLMS/F based Tap Decomposed Adaptive Filter for Decentralized Active Noise Control System</p>
+          <p class="pub-authors">M.L.N.S Karthik, S. Joel, N. V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">IEEE Sensors Letters · 2024</p>
+          <p class="pub-title">Enhanced Bias-Compensated NLMS for Adaptive DOA Estimation</p>
+          <p class="pub-authors">S. Joel, S. K. Yadav, N. V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">IEEE Sensors Letters · Vol. 7, no. 5, May 2023</p>
+          <p class="pub-title">Robust DOA Estimation Based on an Exponential Hyperbolic Cosine Adaptive Algorithm</p>
+          <p class="pub-authors">S. Joel, Krishna Kumar, N. V. George</p>
+        </div>
+
+      </div>
+
+      <p class="pub-section-heading">Conference Articles</p>
+      <div class="pub-list">
+
+        <div class="pub-item">
+          <p class="pub-venue">IEEE ICASSP 2026 · Barcelona, Spain · May 4–8, 2026</p>
+          <p class="pub-title">Adaptive Closed-Form DOA Estimation in the Spherical Harmonics Domain</p>
+          <p class="pub-authors">S. Joel, S. K. Yadav, N. V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">INTER-NOISE 2025</p>
+          <p class="pub-title">Efficient Iterative DOA Estimation using a Rectangular Array in Presence of Data Loss</p>
+          <p class="pub-authors">S. Joel, M.L.N.S Karthik, N. V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">INTER-NOISE 2024</p>
+          <p class="pub-title">A Non-Linear Local Active Noise Control with Integrated Virtual Sensing using an Adaptive Hybrid Spline Filter</p>
+          <p class="pub-authors">M.L.N.S Karthik, S. Joel, N. V. George</p>
         </div>
 
       </div>
@@ -400,7 +479,11 @@
       <div class="contact-items">
         <div class="contact-row">
           <span class="label">Email</span>
-          <a href="mailto:your.email@iitgn.ac.in">your.email@iitgn.ac.in</a>
+          <a href="mailto:joel.s@iitgn.ac.in">joel.s@iitgn.ac.in</a>
+        </div>
+        <div class="contact-row">
+          <span class="label">Phone</span>
+          <a href="tel:+916282442643">+91 6282442643</a>
         </div>
         <div class="contact-row">
           <span class="label">Institution</span>
@@ -408,11 +491,11 @@
         </div>
         <div class="contact-row">
           <span class="label">Google Scholar</span>
-          <a href="#" target="_blank">Scholar Profile →</a>
+          <a href="https://scholar.google.com" target="_blank">Scholar Profile →</a>
         </div>
         <div class="contact-row">
           <span class="label">LinkedIn</span>
-          <a href="#" target="_blank">LinkedIn →</a>
+          <a href="https://linkedin.com" target="_blank">LinkedIn →</a>
         </div>
       </div>
     </section>
@@ -420,7 +503,7 @@
   </main>
 
   <footer>
-    &copy; 2026 Jo · IIT Gandhinagar
+    &copy; 2026 Joel S. · IIT Gandhinagar
   </footer>
 
 </body>
