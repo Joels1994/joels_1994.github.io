@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jo — Electrical Engineering, IIT Gandhinagar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1a18;
+      --muted: #6b6b60;
+      --light: #e8e6df;
+      --bg: #f5f3ed;
+      --accent: #2d5a3d;
+      --rule: #d4d1c7;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-serif);
+      font-size: 18px;
+      line-height: 1.75;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 max(2rem, 5vw);
+      height: 56px;
+    }
+    .nav-name {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ── LAYOUT ── */
+    main { padding-top: 56px; }
+    section {
+      padding: 6rem max(2rem, 5vw);
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    section + section { border-top: 1px solid var(--rule); }
+
+    /* ── HERO ── */
+    #about {
+      padding-top: 7rem;
+      padding-bottom: 5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3rem;
+      align-items: start;
+      max-width: 780px;
+    }
+    .hero-text {}
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+      opacity: 0; animation: fadeUp 0.6s 0.1s forwards;
+    }
+    h1 {
+      font-size: clamp(2.4rem, 5vw, 3.4rem);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.4rem;
+      opacity: 0; animation: fadeUp 0.6s 0.2s forwards;
+    }
+    h1 em { font-style: italic; color: var(--accent); }
+    .hero-bio {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 560px;
+      opacity: 0; animation: fadeUp 0.6s 0.35s forwards;
+    }
+    .hero-links {
+      display: flex; flex-wrap: wrap; gap: 0.6rem;
+      margin-top: 2rem;
+      opacity: 0; animation: fadeUp 0.6s 0.5s forwards;
+    }
+    .btn {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.1rem;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      text-decoration: none;
+      transition: background 0.18s, color 0.18s;
+    }
+    .btn:hover { background: var(--ink); color: var(--bg); }
+    .btn.primary { background: var(--ink); color: var(--bg); }
+    .btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+
+    .avatar-wrap {
+      opacity: 0; animation: fadeUp 0.6s 0.25s forwards;
+    }
+    .avatar {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: var(--light);
+      border: 1px solid var(--rule);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 0.05em;
+      overflow: hidden;
+    }
+    .avatar svg { width: 48px; height: 48px; color: var(--muted); }
+
+    /* ── SECTION TITLES ── */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── RESEARCH ── */
+    .research-grid { display: flex; flex-direction: column; gap: 2.5rem; }
+    .research-item {}
+    .research-item h3 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+    .research-item p {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    .tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.15rem 0.5rem;
+      margin-right: 0.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    /* ── PUBLICATIONS ── */
+    .pub-list { display: flex; flex-direction: column; gap: 2rem; }
+    .pub-item {
+      padding-left: 1.2rem;
+      border-left: 2px solid var(--rule);
+      transition: border-color 0.2s;
+    }
+    .pub-item:hover { border-color: var(--accent); }
+    .pub-venue {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+    .pub-title {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+    .pub-authors {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+    .pub-link {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 0.5rem;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+    .pub-link:hover { border-color: var(--ink); }
+
+    /* ── CONTACT ── */
+    .contact-body { font-size: 1rem; color: var(--muted); max-width: 480px; }
+    .contact-body a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+    .contact-items {
+      margin-top: 2rem;
+      display: flex; flex-direction: column; gap: 0.8rem;
+    }
+    .contact-row {
+      display: flex; gap: 1.2rem; align-items: baseline;
+    }
+    .contact-row .label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      min-width: 80px;
+    }
+    .contact-row a {
+      font-size: 0.95rem;
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+    .contact-row a:hover { border-color: var(--ink); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2.5rem max(2rem, 5vw);
+      border-top: 1px solid var(--rule);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      #about { grid-template-columns: 1fr; }
+      .avatar-wrap { display: none; }
+      .nav-links { gap: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#about" class="nav-name">Jo</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#publications">Publications</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="hero-text">
+        <p class="hero-label">PhD Candidate · IIT Gandhinagar</p>
+        <h1>Jo<br><em>Signal Processing<br>&amp; Spatial Audio</em></h1>
+        <p class="hero-bio">
+          I am a PhD candidate in Electrical Engineering at IIT Gandhinagar, working under
+          Prof. Nithin V. George. My research focuses on adaptive direction-of-arrival estimation
+          and region-of-interest beamforming using microphone array systems. I have also collaborated
+          with Prof. Israel Cohen at Technion through a Viterbi Fellowship.
+        </p>
+        <div class="hero-links">
+          <a href="#publications" class="btn primary">Publications</a>
+          <a href="#contact" class="btn">Contact</a>
+          <a href="#" class="btn">CV ↗</a>
+        </div>
+      </div>
+      <div class="avatar-wrap">
+        <div class="avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESEARCH -->
+    <section id="research">
+      <p class="section-label">Research</p>
+      <div class="research-grid">
+
+        <div class="research-item">
+          <div>
+            <span class="tag">DOA Estimation</span>
+            <span class="tag">Deep Unfolding</span>
+          </div>
+          <h3>Adaptive DOA Estimation via Spherical Microphone Arrays</h3>
+          <p>
+            Developing a deep unfolding framework for direction-of-arrival estimation
+            using spherical harmonic domain representations. The approach integrates
+            algorithm-specific prior knowledge into a trainable network structure with
+            per-layer parameters, targeting IEEE Transactions on Signal Processing.
+          </p>
+        </div>
+
+        <div class="research-item">
+          <div>
+            <span class="tag">Beamforming</span>
+            <span class="tag">Spatial Audio</span>
+          </div>
+          <h3>Region-of-Interest Beamforming</h3>
+          <p>
+            Design and analysis of adaptive beamformers for flexible spatial region
+            selection, with applications to immersive audio capture and acoustic
+            scene analysis. Includes real-time implementation on Speedgoat hardware
+            and evaluation with Neumann KU100 binaural microphones.
+          </p>
+        </div>
+
+        <div class="research-item">
+          <div>
+            <span class="tag">Adaptive Filters</span>
+            <span class="tag">LMS / NLMS / RLS</span>
+          </div>
+          <h3>Adaptive Algorithm Design</h3>
+          <p>
+            Investigation of variable step-size adaptive filtering strategies including
+            DVSS-NLMS and LMP-LMS frameworks for acoustic echo cancellation and
+            active noise control in reverberant environments.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PUBLICATIONS -->
+    <section id="publications">
+      <p class="section-label">Publications</p>
+      <div class="pub-list">
+
+        <div class="pub-item">
+          <p class="pub-venue">IEEE Transactions on Signal Processing · Under Preparation</p>
+          <p class="pub-title">Deep Unfolding for Adaptive DOA Estimation with Spherical Microphone Arrays</p>
+          <p class="pub-authors">Jo, N. V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">PhD Thesis · IIT Gandhinagar</p>
+          <p class="pub-title">Adaptive DOA Estimation and Region-of-Interest Beamforming Using Microphone Array Systems</p>
+          <p class="pub-authors">Jo · Supervisor: Prof. Nithin V. George</p>
+        </div>
+
+        <div class="pub-item">
+          <p class="pub-venue">Collaboration · Technion, Israel</p>
+          <p class="pub-title">Research in Acoustic Signal Processing</p>
+          <p class="pub-authors">Jo, I. Cohen · Viterbi Fellowship</p>
+          <a href="#" class="pub-link">Details →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <p class="section-label">Contact</p>
+      <p class="contact-body">
+        I am open to research collaborations, academic discussions, and industry
+        opportunities in signal processing and spatial audio. Feel free to reach out.
+      </p>
+      <div class="contact-items">
+        <div class="contact-row">
+          <span class="label">Email</span>
+          <a href="mailto:your.email@iitgn.ac.in">your.email@iitgn.ac.in</a>
+        </div>
+        <div class="contact-row">
+          <span class="label">Institution</span>
+          <a href="https://iitgn.ac.in" target="_blank">IIT Gandhinagar</a>
+        </div>
+        <div class="contact-row">
+          <span class="label">Google Scholar</span>
+          <a href="#" target="_blank">Scholar Profile →</a>
+        </div>
+        <div class="contact-row">
+          <span class="label">LinkedIn</span>
+          <a href="#" target="_blank">LinkedIn →</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    &copy; 2026 Jo · IIT Gandhinagar
+  </footer>
+
+</body>
+</html>
