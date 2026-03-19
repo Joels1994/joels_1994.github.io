@@ -259,9 +259,79 @@
       .avatar-wrap { display: none; }
       .nav-links { gap: 1.2rem; }
     }
+
+    /* ── INTRO ── */
+    #intro {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #0d1a12;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.7s ease;
+    }
+    #intro.hidden { opacity: 0; pointer-events: none; }
+    #intro-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+    }
+    #intro-text {
+      position: relative; z-index: 2;
+      text-align: center;
+    }
+    #intro-label {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 400;
+      color: #f5f3ed;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      animation: introFade 0.8s 0.3s forwards;
+    }
+    #intro-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #5fa870;
+      margin-top: 0.6rem;
+      opacity: 0;
+      animation: introFade 0.8s 0.7s forwards;
+    }
+    #intro-bar-wrap {
+      width: 220px;
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+      margin: 1.6rem auto 0;
+      overflow: hidden;
+      opacity: 0;
+      animation: introFade 0.4s 1s forwards;
+    }
+    #intro-bar {
+      height: 100%;
+      width: 0%;
+      background: #5fa870;
+      animation: barFill 2s 1.1s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    @keyframes introFade {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes barFill {
+      from { width: 0%; }
+      to   { width: 100%; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- ── INTRO OVERLAY ── -->
+  <div id="intro">
+    <canvas id="intro-canvas"></canvas>
+    <div id="intro-text">
+      <div id="intro-label">Joel S.</div>
+      <div id="intro-sub">Adaptive DOA Estimation &amp; Beamforming</div>
+      <div id="intro-bar-wrap"><div id="intro-bar"></div></div>
+    </div>
+  </div>
 
   <nav>
     <a href="#about" class="nav-name">Joel S.</a>
@@ -505,6 +575,169 @@
   <footer>
     &copy; 2026 Joel S. · IIT Gandhinagar
   </footer>
+
+  <script>
+  (function() {
+    const canvas = document.getElementById('intro-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, cx, cy, animId;
+    const RADIUS = 120;
+    const NUM_MICS = 18;
+    const NUM_RINGS = 3;
+    const GREEN = '#5fa870';
+    const DGREEN = '#2d5a3d';
+    const FAINT = 'rgba(95,168,112,0.13)';
+    let t = 0;
+
+    // DOA beam direction (slowly sweeps)
+    let beamAngle = Math.PI / 6;
+
+    // Mic positions on sphere (projected to 2D ellipse)
+    function micPos(i, ring) {
+      const perRing = [1, 6, 11][ring];
+      const baseCount = [0, 1, 7][ring];
+      const angle = (2 * Math.PI * i) / perRing;
+      const rScale = [0, 0.42, 0.85][ring];
+      const tilt = 0.38; // ellipse tilt factor
+      const r = RADIUS * rScale;
+      return {
+        x: cx + r * Math.cos(angle),
+        y: cy + r * Math.sin(angle) * tilt
+      };
+    }
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      cx = W / 2; cy = H / 2;
+    }
+
+    function drawSphere() {
+      // Outer ellipse rings (sphere outline)
+      for (let r = 1; r <= NUM_RINGS; r++) {
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, RADIUS * r / NUM_RINGS,
+          RADIUS * r / NUM_RINGS * 0.38, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = FAINT;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+      // Equator
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, RADIUS, RADIUS * 0.38, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(95,168,112,0.22)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // Vertical arc
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, RADIUS * 0.18, RADIUS, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(95,168,112,0.1)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    function drawMics() {
+      const rings = [[0], [0,1,2,3,4,5], [0,1,2,3,4,5,6,7,8,9,10]];
+      rings.forEach((arr, ring) => {
+        arr.forEach((i) => {
+          const p = micPos(i, ring);
+          const pulse = 0.5 + 0.5 * Math.sin(t * 2 + i * 0.9 + ring);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 3.2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(95,168,112,${0.55 + 0.45 * pulse})`;
+          ctx.fill();
+          // outer glow
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(95,168,112,${0.07 * pulse})`;
+          ctx.fill();
+        });
+      });
+    }
+
+    function drawBeam() {
+      beamAngle += 0.008;
+      const beamLen = RADIUS * 2.4;
+      const bx = cx + beamLen * Math.cos(beamAngle);
+      const by = cy + beamLen * Math.sin(beamAngle) * 0.38;
+
+      // Beam cone
+      const spread = 0.18;
+      const x1 = cx + beamLen * Math.cos(beamAngle - spread);
+      const y1 = cy + beamLen * Math.sin(beamAngle - spread) * 0.38;
+      const x2 = cx + beamLen * Math.cos(beamAngle + spread);
+      const y2 = cy + beamLen * Math.sin(beamAngle + spread) * 0.38;
+
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, beamLen);
+      grad.addColorStop(0, 'rgba(95,168,112,0.22)');
+      grad.addColorStop(1, 'rgba(95,168,112,0)');
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Beam center line
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(bx, by);
+      ctx.strokeStyle = 'rgba(95,168,112,0.5)';
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([6, 5]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // DOA label
+      ctx.font = "500 11px 'DM Mono', monospace";
+      ctx.fillStyle = 'rgba(95,168,112,0.75)';
+      const lx = cx + (beamLen * 0.7) * Math.cos(beamAngle);
+      const ly = cy + (beamLen * 0.7) * Math.sin(beamAngle) * 0.38 - 10;
+      ctx.fillText('DOA', lx - 14, ly);
+    }
+
+    function drawWaves() {
+      // Concentric wave rings emanating from source direction
+      for (let w = 0; w < 4; w++) {
+        const phase = (t * 1.1 + w * 0.7) % 2.8;
+        const wr = phase * RADIUS * 0.9;
+        const alpha = Math.max(0, 0.18 - phase * 0.06);
+        const sx = cx + RADIUS * 1.9 * Math.cos(beamAngle);
+        const sy = cy + RADIUS * 1.9 * Math.sin(beamAngle) * 0.38;
+        ctx.beginPath();
+        ctx.arc(sx, sy, wr, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(95,168,112,${alpha})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      t += 0.022;
+      drawSphere();
+      drawWaves();
+      drawBeam();
+      drawMics();
+      animId = requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    draw();
+
+    // Dismiss after 3.2s
+    setTimeout(() => {
+      const intro = document.getElementById('intro');
+      intro.classList.add('hidden');
+      setTimeout(() => {
+        intro.style.display = 'none';
+        cancelAnimationFrame(animId);
+      }, 700);
+    }, 3200);
+  })();
+  </script>
 
 </body>
 </html>
