@@ -247,6 +247,149 @@
       color: var(--muted);
     }
 
+    /* ── DOA DEMO ── */
+    #demo {
+      max-width: 1100px !important;
+    }
+    #doa-app {
+      display: flex;
+      gap: 1.8rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    #doa-controls {
+      width: 210px;
+      flex-shrink: 0;
+    }
+    #doa-outputs {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .doa-row {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .doa-panel {
+      background: rgba(0,0,0,0.03);
+      border: 1px solid var(--rule);
+      padding: 1.4rem;
+    }
+    .doa-panel-title, .doa-card-title {
+      font-family: var(--font-mono);
+      font-size: 0.63rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
+    .doa-card {
+      background: rgba(0,0,0,0.03);
+      border: 1px solid var(--rule);
+      padding: 1.2rem;
+      min-width: 0;
+      flex: 1;
+    }
+    .doa-field {
+      margin-bottom: 1.1rem;
+    }
+    .doa-field label {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.63rem;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .doa-val {
+      color: var(--ink);
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    #doa-source-inputs {
+      margin-bottom: 1rem;
+    }
+    .source-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      align-items: center;
+    }
+    .source-row label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      min-width: 24px;
+    }
+    .source-row input[type=number] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.3rem 0.4rem;
+      outline: none;
+    }
+    .source-row input[type=number]:focus {
+      border-color: var(--accent);
+    }
+    #doa-run {
+      width: 100%;
+      padding: 0.65rem;
+      background: var(--ink);
+      color: var(--bg);
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.18s;
+      margin-top: 0.4rem;
+    }
+    #doa-run:hover { background: var(--accent); }
+    #doa-run:disabled { background: var(--muted); cursor: not-allowed; }
+    #doa-results { font-size: 0.9rem; }
+    .doa-hint { font-size: 0.82rem; color: var(--muted); font-style: italic; }
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.88rem;
+    }
+    .result-row:last-child { border-bottom: none; }
+    .result-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .result-val {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--accent);
+    }
+    #cv-array, #cv-spectrum, #cv-conv {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    @media (max-width: 700px) {
+      #doa-app { flex-direction: column; }
+      #doa-controls { width: 100%; }
+    }
+
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
@@ -533,6 +676,7 @@
         <!-- CONTROLS -->
         <div class="doa-panel" id="doa-controls">
           <div class="doa-panel-title">Parameters</div>
+          <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);margin-bottom:1.2rem;letter-spacing:0.04em;">Array: spherical, 3 rings + 2 poles</div>
 
           <div class="doa-field">
             <label>Number of Sources <span class="doa-val" id="val-sources">2</span></label>
@@ -541,12 +685,12 @@
 
           <div class="doa-field">
             <label>Microphones per Ring <span class="doa-val" id="val-mics">6</span></label>
-            <input type="range" id="inp-mics" min="4" max="12" value="6" step="1">
+            <input type="range" id="inp-mics" min="6" max="12" value="6" step="1">
           </div>
 
           <div class="doa-field">
-            <label>Step Size μ <span class="doa-val" id="val-step">0.05</span></label>
-            <input type="range" id="inp-step" min="1" max="20" value="5" step="1">
+            <label>Step Size μ <span class="doa-val" id="val-step">0.003</span></label>
+            <input type="range" id="inp-step" min="1" max="10" value="3" step="1">
           </div>
 
           <div class="doa-field">
@@ -555,8 +699,8 @@
           </div>
 
           <div class="doa-field">
-            <label>Iterations <span class="doa-val" id="val-iter">200</span></label>
-            <input type="range" id="inp-iter" min="50" max="500" value="200" step="50">
+            <label>Iterations <span class="doa-val" id="val-iter">1000</span></label>
+            <input type="range" id="inp-iter" min="500" max="3000" value="1000" step="100">
           </div>
 
           <div id="doa-source-inputs"></div>
@@ -583,15 +727,19 @@
           </div>
 
           <div class="doa-row">
-            <!-- Spatial Spectrum -->
+            <!-- Root Plot -->
             <div class="doa-card" style="flex:1">
-              <div class="doa-card-title">Spatial Spectrum (Azimuth)</div>
-              <canvas id="cv-spectrum" width="400" height="200"></canvas>
+              <div class="doa-card-title">Root Plot (Unit Circle)</div>
+              <canvas id="cv-roots" width="320" height="320"></canvas>
+              <p class="doa-hint" id="roots-hint" style="margin-top:0.5rem;">Roots appear after estimation.</p>
             </div>
-            <!-- Convergence -->
-            <div class="doa-card" style="flex:1">
-              <div class="doa-card-title">Convergence Curve</div>
-              <canvas id="cv-conv" width="400" height="200"></canvas>
+            <!-- MSE Curve -->
+            <div class="doa-card" style="flex:1.2">
+              <div class="doa-card-title">MSE Learning Curve
+                <span id="mc-status" style="font-size:0.6rem;color:var(--muted);margin-left:0.5rem;"></span>
+              </div>
+              <canvas id="cv-mse" width="420" height="260"></canvas>
+              <p class="doa-hint" id="mse-hint" style="margin-top:0.5rem;">Monte Carlo (500 trials) runs after estimation.</p>
             </div>
           </div>
 
@@ -795,7 +943,7 @@
       proj.forEach(p => {
         const depth = (p.z + R) / (2*R);
         const pulse = 0.5 + 0.5 * Math.sin(t*2.5 + p.phase);
-        const rad = 2.5 + 1.5*depth;
+        const rad = Math.max(0.5, 2.5 + 1.5*depth);
         const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad*4);
         glow.addColorStop(0, `rgba(70,130,220,${0.18*depth*pulse})`);
         glow.addColorStop(1, 'rgba(70,130,220,0)');
@@ -893,331 +1041,334 @@
     }
     return pll;
   }
-  function Ylm_real(l, m, theta, phi){
-    // theta = colatitude [0,pi], phi = azimuth [0,2pi]
-    const cosT = Math.cos(theta);
+
+  // ── COMPLEX spherical harmonic Y_l^m(theta, phi) — matches MATLAB Ylm ──
+  // Returns complex {r,i}: Y_l^m = N * P_l^|m|(cos θ) * exp(i·m·φ)
+  function Ylm_complex(l, m, theta, phi) {
     const absm = Math.abs(m);
     const norm = Math.sqrt((2*l+1)/(4*Math.PI) * factorial(l-absm)/factorial(l+absm));
-    const Plm = assocLegendre(l, absm, cosT);
-    if(m === 0) return norm * Plm;
-    if(m > 0)  return Math.SQRT2 * norm * Plm * Math.cos(m * phi);
-    return Math.SQRT2 * norm * Plm * Math.sin(absm * phi);
+    const Plm  = assocLegendre(l, absm, Math.cos(theta));
+    return C.scale(C.exp(0, m * phi), norm * Plm);
+  }
+
+  // ── i^n as complex number ──
+  function ipow(n) {
+    const k = ((n % 4) + 4) % 4;
+    return [{r:1,i:0},{r:0,i:1},{r:-1,i:0},{r:0,i:-1}][k];
+  }
+
+  // ── Complex division a/b ──
+  function cdiv(a, b) {
+    const d = C.abs2(b);
+    return { r: (a.r*b.r + a.i*b.i)/d, i: (a.i*b.r - a.r*b.i)/d };
   }
 
   // ── Spherical Bessel j_n(x) ──
   function sphBesselJ(n, x){
-    if(Math.abs(x) < 1e-10){
-      return n === 0 ? 1 : 0;
-    }
+    if(Math.abs(x) < 1e-10) return n === 0 ? 1 : 0;
     if(n === 0) return Math.sin(x)/x;
     if(n === 1) return Math.sin(x)/(x*x) - Math.cos(x)/x;
-    // Upward recurrence
     let jm1 = Math.sin(x)/x, j0 = Math.sin(x)/(x*x) - Math.cos(x)/x;
-    for(let k=1;k<n;k++){
-      const jnew = ((2*k+1)/x)*j0 - jm1;
-      jm1 = j0; j0 = jnew;
-    }
+    for(let k=1;k<n;k++){ const jnew=((2*k+1)/x)*j0-jm1; jm1=j0; j0=jnew; }
     return j0;
   }
 
-  // ── Build dodecahedron-like sensor positions ──
-  // We use a numerically uniform spherical layout (rings at golden-ratio latitudes)
+  // ── Spherical array: 3 latitude rings + 2 poles ──
   function buildSensorPositions(micsPerRing){
-    // 3 rings: equator + ±lat, plus poles = 3*micsPerRing + 2 total
-    const pts = [];
-    const lats = [-Math.PI/3, 0, Math.PI/3];
-    lats.forEach((lat, ri) => {
+    const pts=[];
+    const lats=[-Math.PI/3, 0, Math.PI/3];
+    lats.forEach(lat=>{
       for(let i=0;i<micsPerRing;i++){
-        const phi = (2*Math.PI*i/micsPerRing) + ri*(Math.PI/micsPerRing);
-        pts.push({
-          phi,
-          theta: Math.PI/2 - lat,   // colatitude
-          x: Math.cos(lat)*Math.cos(phi),
-          y: Math.cos(lat)*Math.sin(phi),
-          z: Math.sin(lat)
-        });
+        const phi=2*Math.PI*i/micsPerRing;
+        pts.push({ phi, theta:Math.PI/2-lat,
+          x:Math.cos(lat)*Math.cos(phi), y:Math.cos(lat)*Math.sin(phi), z:Math.sin(lat) });
       }
     });
-    // north & south poles
-    pts.push({ phi:0, theta:0,      x:0, y:0, z:1  });
-    pts.push({ phi:0, theta:Math.PI, x:0, y:0, z:-1 });
+    pts.push({phi:0,theta:0,      x:0,y:0,z:1 });
+    pts.push({phi:0,theta:Math.PI,x:0,y:0,z:-1});
     return pts;
   }
 
-  // ── Build SH matrix Yi [I × (N+1)²] ──
+  // ── Build COMPLEX SH matrix Yi [I × cols] ──
   function buildYi(sensors, N){
-    const I = sensors.length;
-    const cols = (N+1)*(N+1);
-    const Yi = [];
-    for(let c=0;c<I;c++){
+    return sensors.map(s => {
       const row = [];
       for(let n=0;n<=N;n++)
         for(let m=-n;m<=n;m++)
-          row.push(Ylm_real(n, m, sensors[c].theta, sensors[c].phi));
-      Yi.push(row);
-    }
-    return Yi; // I × cols
+          row.push(Ylm_complex(n, m, s.theta, s.phi));
+      return row;
+    });
   }
 
-  // ── Build mode coefficient vector b (diagonal of B) ──
+  // ── Build COMPLEX mode coefficients b_nm = 4π·i^n·j_n(π/2) ──
   function buildB(N){
     const b = [];
     for(let n=0;n<=N;n++){
       const jn = sphBesselJ(n, Math.PI/2);
-      const coeff = 4*Math.PI * jn;  // simplified: (4π i^n j_n(kr)), absorb phase
+      const coeff = C.scale(ipow(n), 4*Math.PI*jn);
       for(let m=-n;m<=n;m++) b.push(coeff);
     }
     return b;
   }
 
-  // ── Matrix multiply A[r×k] × B[k×c] → C[r×c] (real) ──
-  function matMul(A, B){
-    const r=A.length, k=B.length, c=B[0].length;
-    const C = Array.from({length:r},()=>new Float64Array(c));
-    for(let i=0;i<r;i++) for(let j=0;j<c;j++){
-      let s=0; for(let l=0;l<k;l++) s+=A[i][l]*B[l][j];
-      C[i][j]=s;
-    }
-    return C;
-  }
-
-  // ── Transpose ──
-  function transpose(A){ return A[0].map((_,j)=>A.map(r=>r[j])); }
-
-  // ── Random complex signal [rows × cols] ──
-  function randComplex(rows, cols){
-    return Array.from({length:rows},()=>
-      Array.from({length:cols},()=>C.scale({r:Math.random()*2-1,i:Math.random()*2-1},Math.SQRT2/2))
-    );
-  }
-
-  // ── Complex matrix × vector: A (m×n real) × x (n complex) → y (m complex) ──
-  function matVecC(A, x){
-    return A.map(row => row.reduce((acc,a,j)=>C.add(acc,C.scale(x[j],a)), C.zero()));
-  }
-
-  // ── NLMS adaptive update (complex, scalar output) ──
-  // W: (M-1) complex weights, z: M complex signal vector → returns {W_new, e}
+  // NLMS update — matches MATLAB exactly:
+  // y = W * z(2:M),  e = z(1) - y
+  // W = W + mu/(z(2:M)'*z(2:M)) * z(2:M)' * e   [z' = conjugate transpose]
   function nlmsUpdate(W, z, mu){
     const ref = z[0];
     const inp = z.slice(1);
-    // y = W^H * inp
+    // y = W * inp  (direct, no conjugation of W)
     let y = C.zero();
-    for(let k=0;k<W.length;k++) y = C.add(y, C.mul(C.conj(W[k]), inp[k]));
+    for(let k=0;k<W.length;k++) y = C.add(y, C.mul(W[k], inp[k]));
     const e = C.sub(ref, y);
-    // power = ||inp||²
-    let pow = inp.reduce((s,v)=>s+C.abs2(v), 0) + 1e-8;
-    // W = W + mu/pow * inp * conj(e)
-    const ce = C.conj(e);
+    // power = inp' * inp = sum |inp[k]|²
+    const pow = inp.reduce((s,v)=>s+C.abs2(v), 0) + 1e-8;
     const step = mu / pow;
-    const Wnew = W.map((w,k) => C.add(w, C.scale(C.mul(inp[k], ce), step)));
+    // W = W + step * conj(inp) * e  (MATLAB: z(2:M)' * e)
+    const Wnew = W.map((w,k) => C.add(w, C.scale(C.mul(C.conj(inp[k]), e), step)));
     return { W: Wnew, e: C.abs(e) };
   }
 
-  // ── Polynomial root finding (companion matrix eigenvalues via QR-ish) ──
-  // For small polynomials: use numerical companion matrix approach
+  // ── Polynomial root finding via Durand-Kerner ──
+  // coeffs[0] is constant term, coeffs[n] is leading (degree n)
   function polyRoots(coeffs){
-    // coeffs: [c0, c1, ..., cn] where polynomial = c0 + c1*z + ... + cn*z^n
-    // Build companion matrix and find eigenvalues via power iteration approximation
-    // For demo purposes: use Durand-Kerner method
     const n = coeffs.length - 1;
+    if(n <= 0) return [];
     const lead = coeffs[n];
-    const p = coeffs.map(c => ({ r: c.r/lead.r - (c.i||0)/lead.r, i: (c.i||0)/lead.r }));
+    const leadAbs2 = C.abs2(lead);
+    // Monic polynomial: divide all by lead (complex division)
+    const p = coeffs.map(c => ({
+      r: (c.r*lead.r + c.i*lead.i) / leadAbs2,
+      i: (c.i*lead.r - c.r*lead.i) / leadAbs2
+    }));
 
-    // Durand-Kerner initial roots on circle
+    // Initial roots spread on circle of radius ~1
     let roots = Array.from({length:n},(_,k)=>{
-      const ang = 2*Math.PI*k/n + 0.1;
-      return { r: 0.7*Math.cos(ang), i: 0.7*Math.sin(ang) };
+      const ang = 2*Math.PI*k/n + 0.4;
+      return { r: 0.9*Math.cos(ang), i: 0.9*Math.sin(ang) };
     });
 
-    for(let iter=0;iter<80;iter++){
+    for(let iter=0;iter<150;iter++){
       const newRoots = roots.map((rk, k) => {
-        // Evaluate polynomial at rk
-        let pval = p[n];
+        // Horner evaluation: p(z) = p[0] + p[1]*z + ... + p[n]*z^n
+        // Rearranged for Horner: start from highest degree
+        let pval = p[n];  // leading coeff (=1 after monic division)
         for(let j=n-1;j>=0;j--) pval = C.add(C.mul(pval, rk), p[j]);
-        // Denominator: product of (rk - rj) for j≠k
+        // Denominator: product (rk - rj) for j≠k
         let denom = C.one();
         for(let j=0;j<n;j++){
           if(j!==k) denom = C.mul(denom, C.sub(rk, roots[j]));
         }
-        const d = C.abs2(denom) < 1e-20 ? { r:rk.r, i:rk.i } : C.sub(rk, {
-          r: (pval.r*denom.r + pval.i*denom.i)/(denom.r*denom.r+denom.i*denom.i),
-          i: (pval.i*denom.r - pval.r*denom.i)/(denom.r*denom.r+denom.i*denom.i)
-        });
-        return d;
+        const dAbs2 = C.abs2(denom);
+        if(dAbs2 < 1e-30) return rk;
+        // pval / denom
+        const frac = {
+          r: (pval.r*denom.r + pval.i*denom.i)/dAbs2,
+          i: (pval.i*denom.r - pval.r*denom.i)/dAbs2
+        };
+        return C.sub(rk, frac);
       });
       roots = newRoots;
     }
     return roots;
   }
 
-  // ── Main simulation ──────────────────────────────────────────────────────
+  // ── Main simulation — faithful to MATLAB code ────────────────────────────
   function runDOA(params){
     const { numSources, micsPerRing, mu, snrDb, snapshots, sourceAngles } = params;
-    const N = 2; // SH order
-    const M = 5; // manifold separation order
-    const modes = Array.from({length:M},(_,k)=>k - (M-1)/2); // [-(M-1)/2 ... (M-1)/2]
-
-    // Build array
-    const sensors = buildSensorPositions(micsPerRing);
-    const I = sensors.length;
-
-    // SH matrix Yi [I × (N+1)²]
-    const Yi = buildYi(sensors, N);
-    const YiT = transpose(Yi);  // (N+1)² × I
-    const cols = (N+1)*(N+1);
-
-    // Mode coefficients B (diagonal)
-    const bDiag = buildB(N);
-
-    // Γ = (4π/I) * I_I
-    const gammaScale = 4*Math.PI/I;
-
-    // eta = B^{-1} * Yi^T * Γ   [cols × I], real
-    // Since B and Γ are diagonal: eta[k][i] = (1/bDiag[k]) * YiT[k][i] * gammaScale
-    const eta = YiT.map((row,k) => row.map(v => v * gammaScale / (bDiag[k] || 1e-10)));
-
-    // Grid for spectrum
-    const phiGrid = Array.from({length:3600},(_,k) => k*2*Math.PI/3600);
-
-    // Y_grid [gridLen × cols]
-    const Y_grid = phiGrid.map(ph =>
-      Array.from({length:cols},(_,idx)=>{
-        let n=0,m=0,cnt=0;
-        outer: for(let nn=0;nn<=N;nn++) for(let mm=-nn;mm<=nn;mm++){ if(cnt===idx){n=nn;m=mm;break outer;} cnt++; }
-        return Ylm_real(n, m, Math.PI/2, ph);
-      })
-    );
-    const Y_gridT = transpose(Y_grid); // cols × gridLen
-
-    // D_S_grid [M × gridLen]: exp(i*mode*phi)
-    const D_S_grid = modes.map(mode =>
-      phiGrid.map(ph => C.exp(0, mode*ph))
-    );
-
-    // G = Anm_grid * D_S_grid^H * (D_S_grid * D_S_grid^H)^{-1}
-    // Anm_grid = Y_gridT [cols × gridLen]
-    // D_S_grid [M × gridLen]
-    // D_S_grid * D_S_grid^H ≈ gridLen * I_M  (approx orthogonal)
-    // So G ≈ (1/gridLen) * Y_gridT * D_S_grid^H  [cols × M]
-    const gridLen = phiGrid.length;
-    // G[k][m] = (1/gridLen) * sum_g Y_gridT[k][g] * conj(D_S_grid[m][g])
-    const G_real = Array.from({length:cols},()=>new Array(M).fill(0));
-    const G_imag = Array.from({length:cols},()=>new Array(M).fill(0));
-    for(let k=0;k<cols;k++)
-      for(let m=0;m<M;m++)
-        for(let g=0;g<gridLen;g++){
-          G_real[k][m] += Y_gridT[k][g] * D_S_grid[m][g].r / gridLen;
-          G_imag[k][m] += Y_gridT[k][g] * (-D_S_grid[m][g].i) / gridLen;
-        }
-
-    // G# = (G^H G)^{-1} G^H  [M × cols] — pseudo-inverse
-    // For simplicity use G^H since G is nearly unitary (M < cols)
-    // G_hash[m][k] = conj(G[k][m]) (normalised)
-    const G_hash_real = Array.from({length:M},()=>new Array(cols).fill(0));
-    const G_hash_imag = Array.from({length:M},()=>new Array(cols).fill(0));
-    for(let m=0;m<M;m++){
-      let norm2=0;
-      for(let k=0;k<cols;k++) norm2+=G_real[k][m]**2+G_imag[k][m]**2;
-      for(let k=0;k<cols;k++){
-        G_hash_real[m][k] =  G_real[k][m]/norm2;
-        G_hash_imag[m][k] = -G_imag[k][m]/norm2;
-      }
-    }
-
-    // Source steering vectors a_S [I × DD]
+    const N = 2;   // SH order
+    const M = 5;   // manifold separation filter order
     const DD = numSources;
     const phiSrc = sourceAngles.map(d => d*Math.PI/180);
 
-    // Simulate snapshots
+    // Gaussian RNG (Box-Muller)
+    function randn(){ const u=Math.random()+1e-10,v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+    function randcn(){ return { r:randn()/Math.SQRT2, i:randn()/Math.SQRT2 }; }
+
+    // ── 1. Build sensor positions ──
+    const sensors = buildSensorPositions(micsPerRing);
+    const I = sensors.length;
+
+    // ── 2. Yi matrix [I × (N+1)²] — COMPLEX (using complex SH Ylm) ──
+    // MATLAB Ylm is complex: Y_n^m = K * P_n^|m|(cosθ) * exp(imφ)
+    const cols = (N+1)*(N+1);
+    // Yi [I][cols] complex
+    const Yi = [];
+    for(let c=0;c<I;c++){
+      const row = [];
+      for(let n=0;n<=N;n++)
+        for(let mm=-n;mm<=n;mm++)
+          row.push(Ylm_complex(n, mm, sensors[c].theta, sensors[c].phi));
+      Yi.push(row);
+    }
+
+    // ── 3. B diagonal (complex): b(col) = 4π*(i)^n * j_n(π/2) ──
+    const bDiag = [];
+    for(let n=0;n<=N;n++){
+      const jn = sphBesselJ(n, Math.PI/2);
+      const bn = C.scale(ipow(n), 4*Math.PI*jn);
+      for(let mm=-n;mm<=n;mm++) bDiag.push(bn);
+    }
+
+    // ── 4. eta = inv(B) * Yi' * Gamma  [cols × I] complex ──
+    // MATLAB: Yi' = conjugate transpose → eta[k][i] = conj(Yi[i][k]) / bDiag[k] * (4π/I)
+    const gammaScale = 4*Math.PI/I;
+    const eta = [];
+    for(let k=0;k<cols;k++){
+      const bInv = cdiv(C.one(), bDiag[k]);
+      const row = [];
+      for(let i=0;i<I;i++){
+        row.push(C.scale(C.mul(bInv, C.conj(Yi[i][k])), gammaScale));
+      }
+      eta.push(row);
+    }
+
+    // ── 5. Grid ──
+    const phiGrid = Array.from({length:3600},(_,k) => k*2*Math.PI/3600);
+    const gridLen = phiGrid.length;
+
+    // Y_grid [gridLen][cols] complex  (theta=π/2 for equatorial plane)
+    const Y_grid = phiGrid.map(ph => {
+      const row = [];
+      for(let n=0;n<=N;n++)
+        for(let mm=-n;mm<=n;mm++)
+          row.push(Ylm_complex(n, mm, Math.PI/2, ph));
+      return row;
+    });
+
+    // Anm_grid = Y_grid^T  [cols × gridLen] complex
+    // Anm_grid[k][g] = Y_grid[g][k]
+    // (In MATLAB: Anm_grid = Y_grid' — conjugate transpose! theta=pi/2 so real anyway)
+
+    // modes = [-(M-1)/2 ... (M-1)/2]
+    const modes = Array.from({length:M},(_,k)=>k-(M-1)/2);
+
+    // D_S_grid [M × gridLen] complex: exp(1i*mode*phi_g)  — matches MATLAB
+    const D_S_grid = modes.map(mode => phiGrid.map(ph => C.exp(0, mode*ph)));
+
+    // ── 6. G = Anm_grid * D_S_grid' * inv(D_S_grid * D_S_grid')  [cols × M] ──
+    // Use plain Y_grid[g][k] (not conjugate) so W1 roots land at exp(-i*phi_src)
+    // matching MATLAB's mod(-angle(roots), 2pi) extraction convention
+    const G = Array.from({length:cols},()=>Array.from({length:M},()=>C.zero()));
+    for(let k=0;k<cols;k++)
+      for(let m=0;m<M;m++)
+        for(let g=0;g<gridLen;g++)
+          G[k][m] = C.add(G[k][m], C.scale(C.mul(Y_grid[g][k], C.conj(D_S_grid[m][g])), 1/gridLen));
+
+    // ── 7. G_hash = inv(G^H * G) * G^H  [M × cols] complex (exact pseudo-inverse) ──
+    // G^H [M × cols]: G_H[m][k] = conj(G[k][m])
+    // G^H * G [M × M] complex
+    const GHG = Array.from({length:M},()=>Array.from({length:M},()=>C.zero()));
+    for(let a=0;a<M;a++)
+      for(let b=0;b<M;b++)
+        for(let k=0;k<cols;k++)
+          GHG[a][b] = C.add(GHG[a][b], C.mul(C.conj(G[k][a]), G[k][b]));
+
+    // inv(GHG) via Gauss-Jordan for M×M complex matrix
+    function invComplexMat(A){
+      const n = A.length;
+      // Augment with identity
+      const aug = A.map((row,i)=>row.map(v=>({...v})).concat(
+        Array.from({length:n},(_,j)=>j===i?C.one():C.zero())
+      ));
+      for(let col=0;col<n;col++){
+        // Find pivot
+        let pivR=col;
+        for(let r=col+1;r<n;r++)
+          if(C.abs(aug[r][col])>C.abs(aug[pivR][col])) pivR=r;
+        [aug[col],aug[pivR]]=[aug[pivR],aug[col]];
+        const piv=aug[col][col];
+        const pivAbs2=C.abs2(piv);
+        if(pivAbs2<1e-30) continue;
+        const pivInv={r:piv.r/pivAbs2,i:-piv.i/pivAbs2};
+        for(let c=0;c<2*n;c++) aug[col][c]=C.mul(aug[col][c],pivInv);
+        for(let r=0;r<n;r++){
+          if(r===col) continue;
+          const f=aug[r][col];
+          for(let c=0;c<2*n;c++) aug[r][c]=C.sub(aug[r][c],C.mul(f,aug[col][c]));
+        }
+      }
+      return aug.map(row=>row.slice(n));
+    }
+
+    const GHG_inv = invComplexMat(GHG);
+
+    // G_hash = GHG_inv * G^H  [M × cols]
+    const G_hash = Array.from({length:M},()=>Array.from({length:cols},()=>C.zero()));
+    for(let a=0;a<M;a++)
+      for(let k=0;k<cols;k++)
+        for(let b=0;b<M;b++)
+          G_hash[a][k] = C.add(G_hash[a][k], C.mul(GHG_inv[a][b], C.conj(G[k][b])));
+
+    // ── 8. Signal simulation + NLMS ──
     const noise_std = Math.pow(10, -snrDb/20);
+    let W = Array.from({length:M-1},()=>C.zero()); // row vector W [1 × M-1]
     const errCurve = [];
 
-    // NLMS weights W [M-1 complex]
-    let W = Array.from({length:M-1},()=>C.zero());
-
-    // We'll accumulate z_hat across snapshots for root estimation
-    // z_hat [M × snapshots complex]
-    const z_hat_all = Array.from({length:M},()=>[]);
-
     for(let snap=0;snap<snapshots;snap++){
-      // Source signal (complex)
-      const src = Array.from({length:DD},()=>C.exp(0, Math.random()*2*Math.PI));
+      // Source: (randn + 1i*randn)/sqrt(2)  [DD]
+      const src = Array.from({length:DD},()=>randcn());
 
-      // Array signal x [I complex]
+      // x_S = a_S * source + noise_std * noise  [I]
       const x = Array.from({length:I},()=>C.zero());
       for(let i=0;i<I;i++){
         for(let j=0;j<DD;j++){
-          // a_S[i][j] = exp(i*pi/2 * sin(theta_n[i]) * cos(phi[j]-phi_n[i]))
-          const sinTheta = Math.sin(sensors[i].theta); // sin of colatitude
-          const phase = Math.PI/2 * sinTheta * Math.cos(phiSrc[j] - sensors[i].phi);
-          const steer = C.exp(0, phase);
-          x[i] = C.add(x[i], C.mul(steer, src[j]));
+          const phase = Math.PI/2 * Math.sin(sensors[i].theta) * Math.cos(phiSrc[j]-sensors[i].phi);
+          x[i] = C.add(x[i], C.mul(C.exp(0,phase), src[j]));
         }
-        // Add noise
-        x[i] = C.add(x[i], C.scale({r:Math.random()*2-1, i:Math.random()*2-1}, noise_std*Math.SQRT2/2));
+        x[i] = C.add(x[i], C.scale(randcn(), noise_std));
       }
 
       // Dnm = eta * x  [cols complex]
-      const Dnm = eta.map(row => row.reduce((acc,e,ii)=>C.add(acc,C.scale(x[ii],e)),C.zero()));
+      const Dnm = eta.map(row => row.reduce((acc,e,ii)=>C.add(acc,C.mul(e,x[ii])),C.zero()));
 
-      // z_hat = G# * Dnm  [M complex]
-      const z = Array.from({length:M},(_,m)=>{
-        let re=0,im=0;
-        for(let k=0;k<cols;k++){
-          re += G_hash_real[m][k]*Dnm[k].r - G_hash_imag[m][k]*Dnm[k].i;
-          im += G_hash_real[m][k]*Dnm[k].i + G_hash_imag[m][k]*Dnm[k].r;
-        }
-        return {r:re,i:im};
-      });
+      // z_hat = G_hash * Dnm  [M complex]
+      const z = G_hash.map(row => row.reduce((acc,g,k)=>C.add(acc,C.mul(g,Dnm[k])),C.zero()));
 
-      for(let m=0;m<M;m++) z_hat_all[m].push(z[m]);
-
-      // NLMS update
-      const res = nlmsUpdate(W, z, mu);
-      W = res.W;
-      errCurve.push(res.e);
+      // NLMS: y = W * z(2:M),  e = z(1) - y
+      // delta = z(2:M)' * e   →  conj(z[k]) * e
+      // W = W + mu/(z(2:M)^H * z(2:M)) * delta
+      const zInp = z.slice(1); // z(2:M)
+      let y = C.zero();
+      for(let k=0;k<W.length;k++) y = C.add(y, C.mul(W[k], zInp[k]));
+      const e = C.sub(z[0], y);
+      const pow = zInp.reduce((s,v)=>s+C.abs2(v),0)+1e-8;
+      // delta = zInp' * e = conj(zInp[k]) * e
+      W = W.map((w,k)=>C.add(w, C.scale(C.mul(C.conj(zInp[k]),e), mu/pow)));
+      errCurve.push(C.abs(e));
     }
 
-    // Build polynomial coefficients W1 = [1; -W]
-    const W1 = [C.one(), ...W.map(w=>({ r:-w.r, i:-w.i }))];
+    // ── 9. Build W1 = [1; -W],  coeff = flipud(conj(W1)) ──
+    // W1 = [1; -W]  (column vector, index 0 = first element)
+    const W1 = [C.one(), ...W.map(w=>({r:-w.r, i:-w.i}))];
 
-    // Flip conjugate for root-finding: coeff = flipud(conj(W1))
-    const coeffs = [...W1].reverse().map(w=>C.conj(w));
+    // MATLAB: coeff = flipud(conj(W1))
+    // flipud reverses the vector, conj takes conjugate of each element
+    // polyRoots expects coeffs[0]=constant, coeffs[n]=leading
+    // W1 is degree-(M-1) poly: W1[0]*z^0 + W1[1]*z^1 + ... + W1[M-1]*z^(M-1)
+    // flipud(conj(W1)) reverses to: conj(W1[M-1])*z^0 + ... + conj(W1[0])*z^(M-1)
+    const coeffs = [...W1].reverse().map(w => C.conj(w));
 
-    // Find roots
+    // ── 10. Root finding ──
     const allRoots = polyRoots(coeffs);
 
-    // Select K=numSources roots closest to unit circle
+    // Select DD roots closest to unit circle
     const sorted = [...allRoots].sort((a,b)=>Math.abs(C.abs(a)-1)-Math.abs(C.abs(b)-1));
-    const sigRoots = sorted.slice(0, DD);
-    const noiseRoots = sorted.slice(DD);
+    const sigRoots  = sorted.slice(0,DD);
+    const noiseRoots= sorted.slice(DD);
 
-    // Convert to angles
+    // theta_est = mod(-angle(sig_roots), 2*pi) — matches MATLAB exactly
     const thetaEst = sigRoots
-      .map(r => { let a = C.angle(r); return a < 0 ? a+2*Math.PI : a; })
-      .map(a => a*180/Math.PI)
-      .sort((a,b)=>a-b);
+      .map(r => {
+        const a = -C.angle(r);
+        return (((a * 180/Math.PI) % 360) + 360) % 360;
+      })
+      .sort((a,b) => a-b);
 
-    // RMSE
     const trueAngles = [...sourceAngles].sort((a,b)=>a-b);
-    const rmse = Math.sqrt(thetaEst.reduce((s,e,k)=>s+(e-trueAngles[k])**2,0)/DD);
+    const rmse = Math.sqrt(thetaEst.reduce((s,v,k)=>s+(v-trueAngles[k])**2,0)/DD);
 
-    // Spatial spectrum: NLMS-based pseudo-spectrum via |W1^H * D_S_grid(:,g)|^2
-    const spectrum = phiGrid.map((_,g)=>{
-      // D_S_grid(:,g) = [exp(i*mode*phi) for mode in modes]
-      let re=0,im=0;
-      for(let m=0;m<M;m++){
-        const d = D_S_grid[m][g];
-        re += W1[m].r*d.r - W1[m].i*d.i;
-        im += W1[m].r*d.i + W1[m].i*d.r;
-      }
-      return 1/(re*re+im*im+1e-6);
-    });
-    const specMax = Math.max(...spectrum);
-    const specNorm = spectrum.map(v=>10*Math.log10(v/specMax+1e-10));
-
-    return { thetaEst, trueAngles, rmse, errCurve, specNorm, phiGrid, allRoots, sigRoots, noiseRoots, sensors };
+    return { thetaEst, trueAngles, rmse, errCurve, allRoots, sigRoots, noiseRoots, sensors };
   }
 
   // ── CANVAS DRAWING ───────────────────────────────────────────────────────
@@ -1259,7 +1410,7 @@
 
     projected.forEach(p=>{
       const depth=(p.z+1)/2;
-      const rad=2+2.5*depth;
+      const rad=Math.max(0.5, 2+2.5*depth);
       const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,rad*3);
       g.addColorStop(0,`rgba(70,130,220,${0.2*depth})`);
       g.addColorStop(1,'rgba(70,130,220,0)');
@@ -1290,58 +1441,70 @@
     ctx.fillText('Azimuth plane', cx-30, H-6);
   }
 
-  function drawSpectrum(canvas, specNorm, phiGrid, trueAngles, estAngles){
+  function drawRootPlot(canvas, allRoots, sigRoots){
     const ctx = canvas.getContext('2d');
     const W=canvas.width, H=canvas.height;
-    const pad={l:36,r:12,t:12,b:28};
-    const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+    const cx=W/2, cy=H/2;
+    const scale=Math.min(W,H)*0.28;
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle='#f5f3ed'; ctx.fillRect(0,0,W,H);
 
-    // Grid
-    ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.8;
-    for(let db=-30;db<=0;db+=10){
-      const y=pad.t+ph*(1-((db+30)/30));
-      ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
-      ctx.fillStyle='rgba(107,107,96,0.7)'; ctx.font="8px 'DM Mono',monospace";
-      ctx.fillText(db+'dB',2,y+3);
-    }
-    for(let deg=0;deg<=360;deg+=90){
-      const x=pad.l+pw*deg/360;
-      ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
-      ctx.fillStyle='rgba(107,107,96,0.7)'; ctx.font="8px 'DM Mono',monospace";
-      ctx.fillText(deg+'°',x-8,pad.t+ph+14);
-    }
+    // Grid lines
+    ctx.strokeStyle='rgba(0,0,0,0.08)'; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
 
-    // Clip spectrum to [-30, 0]
-    const clipped = specNorm.map(v=>Math.max(-30,Math.min(0,v)));
-    // Spectrum line
-    ctx.beginPath();
-    clipped.forEach((v,i)=>{
-      const x=pad.l+pw*i/clipped.length;
-      const y=pad.t+ph*(1-(v+30)/30);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    // Tick labels
+    ctx.fillStyle='rgba(107,107,96,0.7)'; ctx.font="8px 'DM Mono',monospace";
+    ctx.fillText('Re',W-18,cy-4); ctx.fillText('Im',cx+4,10);
+    [-1,1].forEach(v=>{
+      ctx.fillText(v,cx+v*scale-4,cy+10);
+      ctx.beginPath(); ctx.moveTo(cx+v*scale,cy-3); ctx.lineTo(cx+v*scale,cy+3);
+      ctx.stroke();
     });
-    ctx.strokeStyle='rgba(45,90,61,0.85)'; ctx.lineWidth=1.5; ctx.stroke();
 
-    // True DOA markers
-    const colors=['#e05252','#e09b2d','#7b52e0','#52b0e0'];
-    trueAngles.forEach((phi,k)=>{
-      const x=pad.l+pw*phi/360;
-      ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph);
-      ctx.strokeStyle=colors[k%colors.length]+'88'; ctx.lineWidth=1; ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
+    // Unit circle
+    ctx.beginPath(); ctx.arc(cx,cy,scale,0,2*Math.PI);
+    ctx.strokeStyle='rgba(45,90,61,0.55)'; ctx.lineWidth=1.2; ctx.stroke();
+
+    // Build set of signal root keys
+    const sigSet = new Set(sigRoots.map(r=>`${r.r.toFixed(6)},${r.i.toFixed(6)}`));
+
+    // Noise roots
+    allRoots.forEach(r=>{
+      const key=`${r.r.toFixed(6)},${r.i.toFixed(6)}`;
+      if(sigSet.has(key)) return;
+      const px=cx+r.r*scale, py=cy-r.i*scale;
+      ctx.beginPath();
+      ctx.moveTo(px-4,py-4); ctx.lineTo(px+4,py+4);
+      ctx.moveTo(px+4,py-4); ctx.lineTo(px-4,py+4);
+      ctx.strokeStyle='rgba(30,30,30,0.7)'; ctx.lineWidth=1.5; ctx.stroke();
     });
-    // Estimated DOA markers
-    estAngles.forEach((phi,k)=>{
-      const x=pad.l+pw*phi/360;
-      ctx.beginPath(); ctx.moveTo(x,pad.t+4); ctx.lineTo(x,pad.t+ph-4);
-      ctx.strokeStyle=colors[k%colors.length]; ctx.lineWidth=2; ctx.stroke();
+
+    // Signal roots
+    sigRoots.forEach(r=>{
+      const px=cx+r.r*scale, py=cy-r.i*scale;
+      ctx.beginPath();
+      ctx.moveTo(px-5,py-5); ctx.lineTo(px+5,py+5);
+      ctx.moveTo(px+5,py-5); ctx.lineTo(px-5,py+5);
+      ctx.strokeStyle='#e05252'; ctx.lineWidth=2.5; ctx.stroke();
+      ctx.beginPath(); ctx.arc(px,py,5,0,2*Math.PI);
+      ctx.strokeStyle='#e05252'; ctx.lineWidth=1.5; ctx.stroke();
+      const ang=((-Math.atan2(r.i,r.r)%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+      ctx.fillStyle='#c03030'; ctx.font="bold 9px 'DM Mono',monospace";
+      ctx.fillText(`${(ang*180/Math.PI).toFixed(1)}°`,px+7,py-5);
     });
 
     // Legend
-    ctx.fillStyle='rgba(45,90,61,0.8)'; ctx.font="8px 'DM Mono',monospace";
-    ctx.fillText('— Spectrum  ┆ True  | Estimated',pad.l+4,pad.t+10);
+    ctx.strokeStyle='rgba(30,30,30,0.6)'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(8,H-22); ctx.lineTo(14,H-16); ctx.moveTo(14,H-22); ctx.lineTo(8,H-16); ctx.stroke();
+    ctx.fillStyle='rgba(30,30,30,0.6)'; ctx.font="8px 'DM Mono',monospace"; ctx.fillText('noise roots',18,H-17);
+    ctx.strokeStyle='#e05252'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(8,H-8); ctx.lineTo(14,H-2); ctx.moveTo(14,H-8); ctx.lineTo(8,H-2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(11,H-5,4,0,2*Math.PI); ctx.stroke();
+    ctx.fillStyle='#e05252'; ctx.fillText('signal roots',18,H-4);
   }
+
 
   function drawConvergence(canvas, errCurve){
     const ctx=canvas.getContext('2d');
@@ -1403,12 +1566,229 @@
     ctx.fillText('|error|',0,0); ctx.restore();
   }
 
+  // ── ROOT PLOT ─────────────────────────────────────────────────────────────
+  function drawRootPlot(canvas, allRoots, sigRoots, trueAngles){
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width, H=canvas.height, cx=W/2, cy=H/2;
+    const R=Math.min(W,H)*0.38;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#f5f3ed'; ctx.fillRect(0,0,W,H);
+
+    // Axis lines
+    ctx.strokeStyle='rgba(0,0,0,0.08)'; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.moveTo(cx-R*1.25,cy); ctx.lineTo(cx+R*1.25,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx,cy-R*1.25); ctx.lineTo(cx,cy+R*1.25); ctx.stroke();
+
+    // Unit circle
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI);
+    ctx.strokeStyle='rgba(45,90,61,0.35)'; ctx.lineWidth=1.2; ctx.stroke();
+
+    // True DOA radial lines
+    const colors=['#e05252','#e09b2d','#7b52e0','#52b0e0'];
+    trueAngles.forEach((phi,k)=>{
+      const phiR=phi*Math.PI/180;
+      // MATLAB: root is at exp(-i*phi), so on unit circle at angle -phi
+      const rx=cx+R*Math.cos(-phiR), ry=cy+R*Math.sin(-phiR);
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(rx,ry);
+      ctx.strokeStyle=colors[k%colors.length]+'55'; ctx.lineWidth=1;
+      ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
+      // True DOA dot on unit circle
+      ctx.beginPath(); ctx.arc(rx,ry,5,0,2*Math.PI);
+      ctx.fillStyle=colors[k%colors.length]; ctx.fill();
+      // Label
+      const lx=cx+(R+18)*Math.cos(-phiR), ly=cy+(R+18)*Math.sin(-phiR);
+      ctx.fillStyle=colors[k%colors.length];
+      ctx.font="bold 9px 'DM Mono',monospace";
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(phi+'°',lx,ly);
+    });
+
+    // Noise roots
+    const sigSet=new Set(sigRoots.map(r=>r));
+    allRoots.forEach(r=>{
+      if(sigRoots.includes(r)) return;
+      const x=cx+r.r*R, y=cy+r.i*R;
+      ctx.beginPath(); ctx.arc(x,y,3.5,0,2*Math.PI);
+      ctx.fillStyle='rgba(100,100,100,0.45)'; ctx.fill();
+    });
+
+    // Signal roots
+    sigRoots.forEach((r,k)=>{
+      const x=cx+r.r*R, y=cy+r.i*R;
+      // Glow
+      const g=ctx.createRadialGradient(x,y,0,x,y,10);
+      g.addColorStop(0,colors[k%colors.length]+'88'); g.addColorStop(1,'transparent');
+      ctx.beginPath(); ctx.arc(x,y,10,0,2*Math.PI); ctx.fillStyle=g; ctx.fill();
+      // Core
+      ctx.beginPath(); ctx.arc(x,y,5,0,2*Math.PI);
+      ctx.fillStyle=colors[k%colors.length]; ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=1.2; ctx.stroke();
+      // Line from root to unit circle
+      const mag=Math.sqrt(r.r*r.r+r.i*r.i)||1;
+      const ux=cx+R*r.r/mag, uy=cy+R*r.i/mag;
+      ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(ux,uy);
+      ctx.strokeStyle=colors[k%colors.length]+'99'; ctx.lineWidth=1;
+      ctx.setLineDash([2,2]); ctx.stroke(); ctx.setLineDash([]);
+    });
+
+    // Labels
+    ctx.fillStyle='rgba(107,107,96,0.7)'; ctx.font="8px 'DM Mono',monospace";
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('● signal root   ● true DOA   ● noise root',4,4);
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Re',cx+R*1.22,cy-8); ctx.fillText('Im',cx+6,cy-R*1.18);
+  }
+
+  // ── MSE CURVE ─────────────────────────────────────────────────────────────
+  function drawMSE(canvas, mseCurve, snapshots){
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width, H=canvas.height;
+    const pad={l:46,r:12,t:16,b:32};
+    const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#f5f3ed'; ctx.fillRect(0,0,W,H);
+
+    const dB=mseCurve.map(v=>10*Math.log10(v+1e-12));
+    const minDB=Math.floor(Math.min(...dB)/5)*5;
+    const maxDB=Math.ceil(Math.max(...dB)/5)*5;
+    const rangeDB=maxDB-minDB||1;
+
+    // Grid
+    ctx.strokeStyle='rgba(0,0,0,0.07)'; ctx.lineWidth=0.8;
+    for(let db=minDB;db<=maxDB;db+=5){
+      const y=pad.t+ph*(1-(db-minDB)/rangeDB);
+      ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
+      ctx.fillStyle='rgba(107,107,96,0.8)'; ctx.font="8px 'DM Mono',monospace";
+      ctx.textAlign='right'; ctx.fillText(db+'dB',pad.l-4,y+3);
+    }
+    for(let k=0;k<=4;k++){
+      const x=pad.l+pw*k/4;
+      ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
+      ctx.fillStyle='rgba(107,107,96,0.8)'; ctx.font="8px 'DM Mono',monospace";
+      ctx.textAlign='center'; ctx.fillText(Math.round(snapshots*k/4),x,pad.t+ph+14);
+    }
+
+    // Filled area
+    ctx.beginPath();
+    dB.forEach((v,i)=>{
+      const x=pad.l+pw*i/(dB.length-1);
+      const y=pad.t+ph*(1-(v-minDB)/rangeDB);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.lineTo(pad.l+pw,pad.t+ph); ctx.lineTo(pad.l,pad.t+ph); ctx.closePath();
+    const gr=ctx.createLinearGradient(0,pad.t,0,pad.t+ph);
+    gr.addColorStop(0,'rgba(45,90,61,0.3)'); gr.addColorStop(1,'rgba(45,90,61,0.02)');
+    ctx.fillStyle=gr; ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    dB.forEach((v,i)=>{
+      const x=pad.l+pw*i/(dB.length-1);
+      const y=pad.t+ph*(1-(v-minDB)/rangeDB);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle='rgba(45,90,61,0.95)'; ctx.lineWidth=1.8; ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle='rgba(107,107,96,0.85)'; ctx.font="8px 'DM Mono',monospace";
+    ctx.textAlign='center'; ctx.fillText('Snapshot →',pad.l+pw/2,pad.t+ph+26);
+    ctx.save(); ctx.translate(10,pad.t+ph/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('MSE (dB)',0,0); ctx.restore();
+    ctx.textAlign='left'; ctx.fillText('avg over 500 MC trials',pad.l+4,pad.t+4);
+  }
+
+  // ── MONTE CARLO ───────────────────────────────────────────────────────────
+  function runMonteCarlo(params, onProgress, onDone){
+    const { numSources, micsPerRing, mu, snrDb, snapshots, sourceAngles } = params;
+    const MC=500;
+    const N=2,M=5,cols=9;
+    const modes=[-2,-1,0,1,2];
+    const phiSrcs=sourceAngles.map(d=>d*Math.PI/180);
+    const noise_std=Math.pow(10,-snrDb/20);
+
+    // Pre-build array geometry (same for all trials)
+    const sensors=buildSensorPositions(micsPerRing);
+    const I=sensors.length;
+
+    const Yi=sensors.map(s=>{const row=[];for(let n=0;n<=N;n++)for(let m=-n;m<=n;m++)row.push(Ylm_complex(n,m,s.theta,s.phi));return row;});
+    const bDiag=[];for(let n=0;n<=N;n++){const bn=C.scale(ipow(n),4*Math.PI*sphBesselJ(n,Math.PI/2));for(let m=-n;m<=n;m++)bDiag.push(bn);}
+    const gS=4*Math.PI/I;
+    const eta=Array.from({length:cols},(_,k)=>Array.from({length:I},(_,i)=>C.scale(C.mul(cdiv(C.one(),bDiag[k]),C.conj(Yi[i][k])),gS)));
+
+    const phiGrid=Array.from({length:3600},(_,g)=>g*2*Math.PI/3600);
+    const GL=phiGrid.length;
+    const Y_grid=phiGrid.map(ph=>{const row=[];for(let n=0;n<=N;n++)for(let m=-n;m<=n;m++)row.push(Ylm_complex(n,m,Math.PI/2,ph));return row;});
+    const D_S=modes.map(mode=>phiGrid.map(ph=>C.exp(0,mode*ph)));
+    const G=Array.from({length:cols},()=>Array.from({length:M},()=>C.zero()));
+    for(let k=0;k<cols;k++)for(let m=0;m<M;m++)for(let g=0;g<GL;g++)
+      G[k][m]=C.add(G[k][m],C.scale(C.mul(Y_grid[g][k],C.conj(D_S[m][g])),1/GL));
+    const GHG=Array.from({length:M},()=>Array.from({length:M},()=>C.zero()));
+    for(let a=0;a<M;a++)for(let b=0;b<M;b++)for(let k=0;k<cols;k++)
+      GHG[a][b]=C.add(GHG[a][b],C.mul(C.conj(G[k][a]),G[k][b]));
+
+    function invCM(A){
+      const n=A.length;
+      const aug=A.map((row,i)=>row.map(v=>({...v})).concat(Array.from({length:n},(_,j)=>j===i?C.one():C.zero())));
+      for(let c=0;c<n;c++){
+        let pR=c;for(let r=c+1;r<n;r++)if(C.abs(aug[r][c])>C.abs(aug[pR][c]))pR=r;
+        [aug[c],aug[pR]]=[aug[pR],aug[c]];
+        const piv=aug[c][c],pd=C.abs2(piv);if(pd<1e-30)continue;
+        const pi={r:piv.r/pd,i:-piv.i/pd};
+        for(let j=0;j<2*n;j++)aug[c][j]=C.mul(aug[c][j],pi);
+        for(let r=0;r<n;r++){if(r===c)continue;const f=aug[r][c];for(let j=0;j<2*n;j++)aug[r][j]=C.sub(aug[r][j],C.mul(f,aug[c][j]));}
+      }
+      return aug.map(row=>row.slice(n));
+    }
+    const GHG_inv=invCM(GHG);
+    const G_hash=Array.from({length:M},(_,a)=>Array.from({length:cols},(_,k)=>
+      Array.from({length:M}).reduce((acc,_,b)=>C.add(acc,C.mul(GHG_inv[a][b],C.conj(G[k][b]))),C.zero())
+    ));
+
+    function randn(){const u=Math.random()+1e-10,v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+    function randcn(){return{r:randn()/Math.SQRT2,i:randn()/Math.SQRT2};}
+
+    // MSE accumulator [snapshots]
+    const mseAcc=new Float64Array(snapshots).fill(0);
+    let trial=0;
+
+    function runBatch(){
+      const BATCH=25; // trials per timeout chunk
+      const end=Math.min(trial+BATCH, MC);
+      for(;trial<end;trial++){
+        let W=Array.from({length:M-1},()=>C.zero());
+        for(let snap=0;snap<snapshots;snap++){
+          const srcs=Array.from({length:numSources},()=>randcn());
+          const x=sensors.map(s=>{
+            let v=C.zero();
+            phiSrcs.forEach((phi,j)=>v=C.add(v,C.mul(C.exp(0,Math.PI/2*Math.sin(s.theta)*Math.cos(phi-s.phi)),srcs[j])));
+            return C.add(v,C.scale(randcn(),noise_std));
+          });
+          const Dnm=eta.map(row=>row.reduce((acc,e,i)=>C.add(acc,C.mul(e,x[i])),C.zero()));
+          const z=G_hash.map(row=>row.reduce((acc,g,k)=>C.add(acc,C.mul(g,Dnm[k])),C.zero()));
+          const inp=z.slice(1);
+          let y=C.zero();W.forEach((w,k)=>y=C.add(y,C.mul(w,inp[k])));
+          const e=C.sub(z[0],y);
+          const pow=inp.reduce((s,v)=>s+C.abs2(v),0)+1e-8;
+          mseAcc[snap]+=C.abs2(e);
+          W=W.map((w,k)=>C.add(w,C.scale(C.mul(C.conj(inp[k]),e),mu/pow)));
+        }
+      }
+      onProgress(Math.round(trial/MC*100));
+      if(trial<MC){
+        setTimeout(runBatch,0);
+      } else {
+        const mseCurve=Array.from(mseAcc).map(v=>v/MC);
+        onDone(mseCurve);
+      }
+    }
+    setTimeout(runBatch,0);
+  }
+
   // ── UI wiring ────────────────────────────────────────────────────────────
   (function(){
     const sliders = [
       { id:'inp-sources', valId:'val-sources', fmt: v=>v },
       { id:'inp-mics',    valId:'val-mics',    fmt: v=>v },
-      { id:'inp-step',    valId:'val-step',    fmt: v=>(v/100).toFixed(2) },
+      { id:'inp-step',    valId:'val-step',    fmt: v=>(v/1000).toFixed(3) },
       { id:'inp-snr',     valId:'val-snr',     fmt: v=>v },
       { id:'inp-iter',    valId:'val-iter',    fmt: v=>v },
     ];
@@ -1455,7 +1835,7 @@
       setTimeout(()=>{
         const n=parseInt(document.getElementById('inp-sources').value);
         const mics=parseInt(document.getElementById('inp-mics').value);
-        const mu=parseFloat(document.getElementById('inp-step').value)/100;
+        const mu=parseFloat(document.getElementById('inp-step').value)/1000;
         const snr=parseInt(document.getElementById('inp-snr').value);
         const iter=parseInt(document.getElementById('inp-iter').value);
         const sourceAngles=Array.from({length:n},(_,k)=>parseFloat(document.getElementById(`src-az-${k}`)?.value||60));
@@ -1492,8 +1872,19 @@
         }
         animateArray2();
 
-        drawSpectrum(document.getElementById('cv-spectrum'), result.specNorm, result.phiGrid, result.trueAngles, result.thetaEst);
-        drawConvergence(document.getElementById('cv-conv'), result.errCurve);
+        // Draw root plot
+        drawRootPlot(document.getElementById('cv-roots'), result.allRoots, result.sigRoots, result.trueAngles);
+        document.getElementById('roots-hint').style.display='none';
+
+        // Launch Monte Carlo async
+        document.getElementById('mse-hint').textContent='Running 500 Monte Carlo trials…';
+        document.getElementById('mc-status').textContent='';
+        runMonteCarlo({ numSources:n, micsPerRing:mics, mu, snrDb:snr, snapshots:iter, sourceAngles },
+          (progress)=>{ document.getElementById('mc-status').textContent=`${progress}%`; },
+          (mseCurve)=>{ drawMSE(document.getElementById('cv-mse'), mseCurve, iter);
+                        document.getElementById('mse-hint').style.display='none';
+                        document.getElementById('mc-status').textContent='done'; }
+        );
 
         btn.disabled=false; btn.textContent='Run Estimator';
       }, 30);
