@@ -11,12 +11,12 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --ink: #1a1a18;
-      --muted: #6b6b60;
-      --light: #e8e6df;
-      --bg: #f5f3ed;
-      --accent: #2d5a3d;
-      --rule: #d4d1c7;
+      --ink: #e8e6e0;
+      --muted: #888880;
+      --light: #1e1e1c;
+      --bg: #0a0a09;
+      --accent: #4aaf72;
+      --rule: #242420;
       --font-serif: 'EB Garamond', Georgia, serif;
       --font-mono: 'DM Mono', monospace;
     }
@@ -34,7 +34,8 @@
     /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: var(--bg);
+      background: rgba(10,10,9,0.88);
+      backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--rule);
       display: flex; justify-content: space-between; align-items: center;
       padding: 0 max(2rem, 5vw);
@@ -61,7 +62,7 @@
     .nav-links a:hover { color: var(--ink); }
 
     /* ── LAYOUT ── */
-    main { padding-top: 56px; }
+    main { padding-top: 56px; position: relative; z-index: 1; }
     section {
       padding: 6rem max(2rem, 5vw);
       max-width: 780px;
@@ -274,7 +275,7 @@
       flex-wrap: wrap;
     }
     .doa-panel {
-      background: rgba(0,0,0,0.03);
+      background: rgba(255,255,255,0.04);
       border: 1px solid var(--rule);
       padding: 1.4rem;
     }
@@ -287,11 +288,18 @@
       margin-bottom: 1.2rem;
     }
     .doa-card {
-      background: rgba(0,0,0,0.03);
+      background: rgba(255,255,255,0.04);
       border: 1px solid var(--rule);
       padding: 1.2rem;
       min-width: 0;
       flex: 1;
+      overflow: hidden;
+    }
+    .doa-card canvas {
+      width: 100% !important;
+      height: auto !important;
+      display: block;
+      max-width: 100%;
     }
     .doa-field {
       margin-bottom: 1.1rem;
@@ -430,7 +438,7 @@
     #intro-loader-bar {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, rgba(144,238,144,0.5), rgba(144,238,144,1));
+      background: linear-gradient(90deg, rgba(220,60,60,0.7), rgba(255,80,80,1));
       animation: loaderFill 9s 1.1s cubic-bezier(0.4,0,0.2,1) forwards;
     }
     @keyframes introNameFade {
@@ -448,6 +456,7 @@
   </style>
 </head>
 <body>
+
 
   <!-- ── INTRO OVERLAY ── -->
   <div id="intro">
@@ -476,12 +485,7 @@
         <p class="hero-label">PhD Candidate · IIT Gandhinagar</p>
         <h1>Joel S.<br><em>Signal Processing<br>&amp; Spatial Audio</em></h1>
         <p class="hero-bio">
-          I am a PhD candidate in Electrical Engineering at IIT Gandhinagar (GPA: 9.58/10),
-          working under Prof. Nithin V. George. My research spans adaptive beamforming,
-          direction-of-arrival estimation, and spatial audio processing for microphone array systems.
-          I was a Visiting Research Fellow at Technion – Israel Institute of Technology,
-          supported by the Viterbi Fellowship, collaborating with Prof. Israel Cohen on
-          time-domain region-of-interest beamforming.
+          I am a PhD candidate in Electrical Engineering at IIT Gandhinagar, working under Prof. Nithin V. George. My research spans adaptive beamforming, direction-of-arrival estimation, and spatial audio processing for microphone array systems.
         </p>
         <div class="hero-links">
           <a href="#publications" class="btn primary">Publications</a>
@@ -668,7 +672,7 @@
     <section id="demo">
       <p class="section-label">Interactive Demo</p>
       <p style="font-size:1rem;color:var(--muted);margin-bottom:2.5rem;max-width:560px;">
-        Simulate adaptive spherical harmonic DOA estimation. Set the array and source parameters, then run the estimator to visualise the spatial spectrum, convergence, and 3D array geometry.
+        Adaptive ULA DOA estimation via LMS backward linear prediction. Set array and source parameters, then run the estimator to visualise the spatial spectrum, root plot, and learning curve.
       </p>
 
       <div id="doa-app">
@@ -676,34 +680,49 @@
         <!-- CONTROLS -->
         <div class="doa-panel" id="doa-controls">
           <div class="doa-panel-title">Parameters</div>
-          <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);margin-bottom:1.2rem;letter-spacing:0.04em;">Array: spherical, 3 rings + 2 poles</div>
+          <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);margin-bottom:1.2rem;letter-spacing:0.04em;">Array: ULA, half-wavelength spacing</div>
 
           <div class="doa-field">
-            <label>Number of Sources <span class="doa-val" id="val-sources">2</span></label>
-            <input type="range" id="inp-sources" min="1" max="4" value="2" step="1">
+            <label>Sensors M <span class="doa-val" id="val-M">12</span></label>
+            <input type="range" id="inp-M" min="4" max="24" value="12" step="1">
           </div>
 
           <div class="doa-field">
-            <label>Microphones per Ring <span class="doa-val" id="val-mics">6</span></label>
-            <input type="range" id="inp-mics" min="6" max="12" value="6" step="1">
+            <label>Sources K <span class="doa-val" id="val-K">3</span></label>
+            <input type="range" id="inp-K" min="1" max="4" value="3" step="1">
           </div>
 
           <div class="doa-field">
-            <label>Step Size μ <span class="doa-val" id="val-step">0.003</span></label>
-            <input type="range" id="inp-step" min="1" max="10" value="3" step="1">
+            <label>Snapshots <span class="doa-val" id="val-snaps">400</span></label>
+            <input type="range" id="inp-snaps" min="100" max="2000" value="400" step="50">
           </div>
 
           <div class="doa-field">
-            <label>SNR (dB) <span class="doa-val" id="val-snr">10</span></label>
-            <input type="range" id="inp-snr" min="-5" max="30" value="10" step="1">
+            <label>Step Size μ <span class="doa-val" id="val-mu">0.001</span></label>
+            <input type="range" id="inp-mu" min="1" max="20" value="2" step="1">
           </div>
 
           <div class="doa-field">
-            <label>Iterations <span class="doa-val" id="val-iter">1000</span></label>
-            <input type="range" id="inp-iter" min="500" max="3000" value="1000" step="100">
+            <label>SNR (dB) <span class="doa-val" id="val-snr">20</span></label>
+            <input type="range" id="inp-snr" min="-5" max="30" value="20" step="1">
           </div>
 
-          <div id="doa-source-inputs"></div>
+          <div id="doa-source-inputs">
+            <div style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:0.3rem;">Source Angles θ (°)</div>
+            <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);margin-bottom:0.6rem;">Range −90° to 90°</div>
+            <div class="source-row" id="src-row-0">
+              <label>S1</label><input type="number" id="src-az-0" value="0" min="-90" max="90" step="1">
+            </div>
+            <div class="source-row" id="src-row-1">
+              <label>S2</label><input type="number" id="src-az-1" value="40" min="-90" max="90" step="1">
+            </div>
+            <div class="source-row" id="src-row-2">
+              <label>S3</label><input type="number" id="src-az-2" value="60" min="-90" max="90" step="1">
+            </div>
+            <div class="source-row" id="src-row-3" style="display:none;">
+              <label>S4</label><input type="number" id="src-az-3" value="-30" min="-90" max="90" step="1">
+            </div>
+          </div>
 
           <button id="doa-run">Run Estimator</button>
         </div>
@@ -712,12 +731,10 @@
         <div id="doa-outputs">
 
           <div class="doa-row">
-            <!-- 3D Array -->
             <div class="doa-card" style="flex:1.1">
-              <div class="doa-card-title">3D Spherical Array</div>
-              <canvas id="cv-array" width="300" height="300"></canvas>
+              <div class="doa-card-title">ULA Geometry</div>
+              <canvas id="cv-array" width="320" height="280"></canvas>
             </div>
-            <!-- Results -->
             <div class="doa-card" style="flex:0.9">
               <div class="doa-card-title">Estimated DOA</div>
               <div id="doa-results">
@@ -727,19 +744,30 @@
           </div>
 
           <div class="doa-row">
-            <!-- Root Plot -->
-            <div class="doa-card" style="flex:1">
-              <div class="doa-card-title">Root Plot (Unit Circle)</div>
-              <canvas id="cv-roots" width="320" height="320"></canvas>
-              <p class="doa-hint" id="roots-hint" style="margin-top:0.5rem;">Roots appear after estimation.</p>
+            <div class="doa-card" style="flex:1.3">
+              <div class="doa-card-title">Spatial Spectrum</div>
+              <canvas id="cv-spectrum" width="440" height="240"></canvas>
+              <p class="doa-hint" id="spec-hint" style="margin-top:0.4rem;">LMS spectrum appears after estimation.</p>
             </div>
-            <!-- MSE Curve -->
+            <div class="doa-card" style="flex:1">
+              <div class="doa-card-title">Root Plot — Final</div>
+              <canvas id="cv-roots" width="300" height="300"></canvas>
+              <p class="doa-hint" id="roots-hint" style="margin-top:0.4rem;">Final roots after all snapshots.</p>
+            </div>
+          </div>
+
+          <div class="doa-row">
             <div class="doa-card" style="flex:1.2">
-              <div class="doa-card-title">MSE Learning Curve
-                <span id="mc-status" style="font-size:0.6rem;color:var(--muted);margin-left:0.5rem;"></span>
+              <div class="doa-card-title">LMS Learning Curve
+                <span id="anim-status" style="font-size:0.6rem;color:var(--muted);margin-left:0.5rem;"></span>
               </div>
-              <canvas id="cv-mse" width="420" height="260"></canvas>
-              <p class="doa-hint" id="mse-hint" style="margin-top:0.5rem;">Monte Carlo (500 trials) runs after estimation.</p>
+              <canvas id="cv-mse" width="460" height="220"></canvas>
+              <p class="doa-hint" id="mse-hint" style="margin-top:0.4rem;">Animates over snapshots after estimation.</p>
+            </div>
+            <div class="doa-card" style="flex:1">
+              <div class="doa-card-title">Root Evolution</div>
+              <canvas id="cv-roots-anim" width="300" height="300"></canvas>
+              <p class="doa-hint" id="roots-anim-hint" style="margin-top:0.4rem;">Roots evolving over iterations.</p>
             </div>
           </div>
 
@@ -757,7 +785,7 @@
       <div class="contact-items">
         <div class="contact-row">
           <span class="label">Email</span>
-          <a href="mailto:joel.s@iitgn.ac.in">joel.s@iitgn.ac.in</a>
+          <a href="/cdn-cgi/l/email-protection#600a0f050c4e1320090914070e4e01034e090e"><span class="__cf_email__" data-cfemail="0963666c65277a4960607d6e6727686a276067">[email&#160;protected]</span></a>
         </div>
         <div class="contact-row">
           <span class="label">Phone</span>
@@ -784,7 +812,7 @@
     &copy; 2026 Joel S. · IIT Gandhinagar
   </footer>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   (function() {
     const canvas = document.getElementById('intro-canvas');
     const ctx = canvas.getContext('2d');
@@ -852,7 +880,7 @@
         ctx.beginPath();
         pts.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
         ctx.closePath();
-        ctx.strokeStyle = 'rgba(70,130,220,0.08)';
+        ctx.strokeStyle = 'rgba(255,255,255,0.07)';
         ctx.lineWidth = 0.7; ctx.stroke();
       }
       for (let lon = 0; lon < 360; lon += 45) {
@@ -865,7 +893,7 @@
         }
         ctx.beginPath();
         pts.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
-        ctx.strokeStyle = 'rgba(70,130,220,0.08)';
+        ctx.strokeStyle = 'rgba(255,255,255,0.07)';
         ctx.lineWidth = 0.7; ctx.stroke();
       }
     }
@@ -881,7 +909,7 @@
             const alpha = Math.max(0, 0.18 * (1 + avgZ/R));
             ctx.beginPath();
             ctx.moveTo(pi.x, pi.y); ctx.lineTo(pj.x, pj.y);
-            ctx.strokeStyle = `rgba(70,130,220,${alpha})`;
+            ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
             ctx.lineWidth = 0.7; ctx.stroke();
           }
         }
@@ -945,20 +973,20 @@
         const pulse = 0.5 + 0.5 * Math.sin(t*2.5 + p.phase);
         const rad = Math.max(0.5, 2.5 + 1.5*depth);
         const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad*4);
-        glow.addColorStop(0, `rgba(70,130,220,${0.18*depth*pulse})`);
-        glow.addColorStop(1, 'rgba(70,130,220,0)');
+        glow.addColorStop(0, `rgba(255,255,255,${0.15*depth*pulse})`);
+        glow.addColorStop(1, 'rgba(255,255,255,0)');
         ctx.beginPath(); ctx.arc(p.x, p.y, rad*4, 0, Math.PI*2);
         ctx.fillStyle = glow; ctx.fill();
         ctx.beginPath(); ctx.arc(p.x, p.y, rad, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(70,130,220,${0.25 + 0.75*depth})`; ctx.fill();
+        ctx.fillStyle = `rgba(255,255,255,${0.3 + 0.7*depth})`; ctx.fill();
       });
     }
 
     function draw() {
       ctx.clearRect(0, 0, W, H);
       const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W,H)*0.5);
-      bg.addColorStop(0, 'rgba(10,20,50,0.4)');
-      bg.addColorStop(1, 'rgba(8,15,10,0)');
+      bg.addColorStop(0, 'rgba(255,255,255,0.03)');
+      bg.addColorStop(1, 'rgba(0,8,4,0)');
       ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
       t += 0.018;
@@ -999,895 +1027,696 @@
   </script>
 
   <script>
-  // ── ADAPTIVE SPHERICAL DOA ESTIMATOR ──────────────────────────────────────
-  // Based on: Manifold-separation + NLMS adaptive weight update + root-finding
-  // Reference: Joel S., Yadav, George — Adaptive DOA Estimation, IIT Gandhinagar
-  // ─────────────────────────────────────────────────────────────────────────
+  // ── ULA DOA ESTIMATOR — LMS Backward Linear Prediction + Root Finding ──────
+  // MATLAB source: LMS adaptive filter on ULA, spatial spectrum, root extraction
+  // Steering vector: a[m] = exp(-j*pi*m*sin(theta))
+  // LMS: w = w + 2*mu*conj(e)*x_bar
+  // Full weight vector: w_full = [1; -w]
+  // Spectrum: P = 1/|w_full' * a_grid|
+  // Roots: coeff = flipud(conj(w_full)), find polynomial roots
+  // DOA: theta = arcsin(-angle(root)/pi)
 
-  // ── Complex number helpers ──
+  // ── COMPLEX ARITHMETIC ──────────────────────────────────────────────────────
   const C = {
-    add:  (a,b) => ({ r: a.r+b.r, i: a.i+b.i }),
-    sub:  (a,b) => ({ r: a.r-b.r, i: a.i-b.i }),
-    mul:  (a,b) => ({ r: a.r*b.r - a.i*b.i, i: a.r*b.i + a.i*b.r }),
-    conj: (a)   => ({ r: a.r, i: -a.i }),
-    abs:  (a)   => Math.sqrt(a.r*a.r + a.i*a.i),
-    abs2: (a)   => a.r*a.r + a.i*a.i,
-    scale:(a,s) => ({ r: a.r*s, i: a.i*s }),
-    exp:  (re,im) => { const e=Math.exp(re); return { r: e*Math.cos(im), i: e*Math.sin(im) }; },
-    from: (r,i=0) => ({ r, i }),
-    angle:(a)   => Math.atan2(a.i, a.r),
-    zero: ()    => ({ r:0, i:0 }),
-    one:  ()    => ({ r:1, i:0 }),
+    add: (a,b)=>({r:a.r+b.r, i:a.i+b.i}),
+    sub: (a,b)=>({r:a.r-b.r, i:a.i-b.i}),
+    mul: (a,b)=>({r:a.r*b.r-a.i*b.i, i:a.r*b.i+a.i*b.r}),
+    conj:(a)=>({r:a.r, i:-a.i}),
+    abs: (a)=>Math.sqrt(a.r*a.r+a.i*a.i),
+    abs2:(a)=>a.r*a.r+a.i*a.i,
+    scale:(a,s)=>({r:a.r*s, i:a.i*s}),
+    exp: (re,im)=>{const e=Math.exp(re); return{r:e*Math.cos(im),i:e*Math.sin(im)};},
+    angle:(a)=>Math.atan2(a.i,a.r),
+    zero:()=>({r:0,i:0}), one:()=>({r:1,i:0}),
   };
+  function cdiv(a,b){const d=C.abs2(b);return{r:(a.r*b.r+a.i*b.i)/d,i:(a.i*b.r-a.r*b.i)/d};}
+  function randn(){const u=Math.random()+1e-10,v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  function randcn(){return{r:randn()/Math.SQRT2,i:randn()/Math.SQRT2};}
 
-  // ── Real spherical harmonics Ylm (real-valued) ──
-  function factorial(n){ let f=1; for(let k=2;k<=n;k++) f*=k; return f; }
-  function assocLegendre(l, m, x) {
-    // P_l^m(x) via recurrence
-    const absm = Math.abs(m);
-    let pmm = 1.0;
-    if(absm > 0){
-      let sx = Math.sqrt((1-x)*(1+x));
-      let fact = 1.0;
-      for(let i=1;i<=absm;i++){ pmm *= (-fact)*sx; fact += 2; }
-    }
-    if(l === absm) return pmm;
-    let pmmp1 = x*(2*absm+1)*pmm;
-    if(l === absm+1) return pmmp1;
-    let pll = 0;
-    for(let ll=absm+2;ll<=l;ll++){
-      pll = ((2*ll-1)*x*pmmp1 - (ll+absm-1)*pmm)/(ll-absm);
-      pmm = pmmp1; pmmp1 = pll;
-    }
-    return pll;
-  }
-
-  // ── COMPLEX spherical harmonic Y_l^m(theta, phi) — matches MATLAB Ylm ──
-  // Returns complex {r,i}: Y_l^m = N * P_l^|m|(cos θ) * exp(i·m·φ)
-  function Ylm_complex(l, m, theta, phi) {
-    const absm = Math.abs(m);
-    const norm = Math.sqrt((2*l+1)/(4*Math.PI) * factorial(l-absm)/factorial(l+absm));
-    const Plm  = assocLegendre(l, absm, Math.cos(theta));
-    return C.scale(C.exp(0, m * phi), norm * Plm);
-  }
-
-  // ── i^n as complex number ──
-  function ipow(n) {
-    const k = ((n % 4) + 4) % 4;
-    return [{r:1,i:0},{r:0,i:1},{r:-1,i:0},{r:0,i:-1}][k];
-  }
-
-  // ── Complex division a/b ──
-  function cdiv(a, b) {
-    const d = C.abs2(b);
-    return { r: (a.r*b.r + a.i*b.i)/d, i: (a.i*b.r - a.r*b.i)/d };
-  }
-
-  // ── Spherical Bessel j_n(x) ──
-  function sphBesselJ(n, x){
-    if(Math.abs(x) < 1e-10) return n === 0 ? 1 : 0;
-    if(n === 0) return Math.sin(x)/x;
-    if(n === 1) return Math.sin(x)/(x*x) - Math.cos(x)/x;
-    let jm1 = Math.sin(x)/x, j0 = Math.sin(x)/(x*x) - Math.cos(x)/x;
-    for(let k=1;k<n;k++){ const jnew=((2*k+1)/x)*j0-jm1; jm1=j0; j0=jnew; }
-    return j0;
-  }
-
-  // ── Spherical array: 3 latitude rings + 2 poles ──
-  function buildSensorPositions(micsPerRing){
-    const pts=[];
-    const lats=[-Math.PI/3, 0, Math.PI/3];
-    lats.forEach(lat=>{
-      for(let i=0;i<micsPerRing;i++){
-        const phi=2*Math.PI*i/micsPerRing;
-        pts.push({ phi, theta:Math.PI/2-lat,
-          x:Math.cos(lat)*Math.cos(phi), y:Math.cos(lat)*Math.sin(phi), z:Math.sin(lat) });
-      }
-    });
-    pts.push({phi:0,theta:0,      x:0,y:0,z:1 });
-    pts.push({phi:0,theta:Math.PI,x:0,y:0,z:-1});
-    return pts;
-  }
-
-  // ── Build COMPLEX SH matrix Yi [I × cols] ──
-  function buildYi(sensors, N){
-    return sensors.map(s => {
-      const row = [];
-      for(let n=0;n<=N;n++)
-        for(let m=-n;m<=n;m++)
-          row.push(Ylm_complex(n, m, s.theta, s.phi));
-      return row;
-    });
-  }
-
-  // ── Build COMPLEX mode coefficients b_nm = 4π·i^n·j_n(π/2) ──
-  function buildB(N){
-    const b = [];
-    for(let n=0;n<=N;n++){
-      const jn = sphBesselJ(n, Math.PI/2);
-      const coeff = C.scale(ipow(n), 4*Math.PI*jn);
-      for(let m=-n;m<=n;m++) b.push(coeff);
-    }
-    return b;
-  }
-
-  // NLMS update — matches MATLAB exactly:
-  // y = W * z(2:M),  e = z(1) - y
-  // W = W + mu/(z(2:M)'*z(2:M)) * z(2:M)' * e   [z' = conjugate transpose]
-  function nlmsUpdate(W, z, mu){
-    const ref = z[0];
-    const inp = z.slice(1);
-    // y = W * inp  (direct, no conjugation of W)
-    let y = C.zero();
-    for(let k=0;k<W.length;k++) y = C.add(y, C.mul(W[k], inp[k]));
-    const e = C.sub(ref, y);
-    // power = inp' * inp = sum |inp[k]|²
-    const pow = inp.reduce((s,v)=>s+C.abs2(v), 0) + 1e-8;
-    const step = mu / pow;
-    // W = W + step * conj(inp) * e  (MATLAB: z(2:M)' * e)
-    const Wnew = W.map((w,k) => C.add(w, C.scale(C.mul(C.conj(inp[k]), e), step)));
-    return { W: Wnew, e: C.abs(e) };
-  }
-
-  // ── Polynomial root finding via Durand-Kerner ──
-  // coeffs[0] is constant term, coeffs[n] is leading (degree n)
+  // ── POLYNOMIAL ROOT FINDING (Weierstrass/Durand-Kerner) ─────────────────────
   function polyRoots(coeffs){
-    const n = coeffs.length - 1;
-    if(n <= 0) return [];
-    const lead = coeffs[n];
-    const leadAbs2 = C.abs2(lead);
-    // Monic polynomial: divide all by lead (complex division)
-    const p = coeffs.map(c => ({
-      r: (c.r*lead.r + c.i*lead.i) / leadAbs2,
-      i: (c.i*lead.r - c.r*lead.i) / leadAbs2
-    }));
-
-    // Initial roots spread on circle of radius ~1
-    let roots = Array.from({length:n},(_,k)=>{
-      const ang = 2*Math.PI*k/n + 0.4;
-      return { r: 0.9*Math.cos(ang), i: 0.9*Math.sin(ang) };
+    const n=coeffs.length-1;
+    const lead=coeffs[n]; const ld=C.abs2(lead);
+    const p=coeffs.map(c=>({r:(c.r*lead.r+c.i*lead.i)/ld,i:(c.i*lead.r-c.r*lead.i)/ld}));
+    let roots=Array.from({length:n},(_,k)=>{
+      const ang=2*Math.PI*k/n+0.3;
+      return{r:0.9*Math.cos(ang),i:0.9*Math.sin(ang)};
     });
-
-    for(let iter=0;iter<150;iter++){
-      const newRoots = roots.map((rk, k) => {
-        // Horner evaluation: p(z) = p[0] + p[1]*z + ... + p[n]*z^n
-        // Rearranged for Horner: start from highest degree
-        let pval = p[n];  // leading coeff (=1 after monic division)
-        for(let j=n-1;j>=0;j--) pval = C.add(C.mul(pval, rk), p[j]);
-        // Denominator: product (rk - rj) for j≠k
-        let denom = C.one();
-        for(let j=0;j<n;j++){
-          if(j!==k) denom = C.mul(denom, C.sub(rk, roots[j]));
-        }
-        const dAbs2 = C.abs2(denom);
-        if(dAbs2 < 1e-30) return rk;
-        // pval / denom
-        const frac = {
-          r: (pval.r*denom.r + pval.i*denom.i)/dAbs2,
-          i: (pval.i*denom.r - pval.r*denom.i)/dAbs2
-        };
-        return C.sub(rk, frac);
+    for(let iter=0;iter<300;iter++){
+      roots=roots.map((rk,k)=>{
+        let pval=p[n];
+        for(let j=n-1;j>=0;j--) pval=C.add(C.mul(pval,rk),p[j]);
+        let denom=C.one();
+        for(let j=0;j<n;j++){if(j!==k)denom=C.mul(denom,C.sub(rk,roots[j]));}
+        const dA=C.abs2(denom);
+        if(dA<1e-30) return rk;
+        return C.sub(rk,cdiv(pval,denom));
       });
-      roots = newRoots;
     }
     return roots;
   }
 
-  // ── Main simulation — faithful to MATLAB code ────────────────────────────
+  // ── STEERING VECTOR ──────────────────────────────────────────────────────────
+  // a[m] = exp(-j*pi*m*sin(theta))  for m=0,1,...,M-1
+  function steeringVec(M, thetaRad){
+    return Array.from({length:M},(_,m)=>C.exp(0,-Math.PI*m*Math.sin(thetaRad)));
+  }
+
+  // ── MAIN LMS DOA ESTIMATOR ───────────────────────────────────────────────────
   function runDOA(params){
-    const { numSources, micsPerRing, mu, snrDb, snapshots, sourceAngles } = params;
-    const N = 2;   // SH order
-    const M = 5;   // manifold separation filter order
-    const DD = numSources;
-    const phiSrc = sourceAngles.map(d => d*Math.PI/180);
+    const {M, K, snapshots, mu, snrDb, sourceAngles} = params;
+    const thetaSrc = sourceAngles.map(d=>d*Math.PI/180);
+    const noise_std = Math.pow(10,-snrDb/20);
 
-    // Gaussian RNG (Box-Muller)
-    function randn(){ const u=Math.random()+1e-10,v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
-    function randcn(){ return { r:randn()/Math.SQRT2, i:randn()/Math.SQRT2 }; }
+    const A = thetaSrc.map(th=>steeringVec(M,th));
 
-    // ── 1. Build sensor positions ──
-    const sensors = buildSensorPositions(micsPerRing);
-    const I = sensors.length;
+    let w = Array.from({length:M-1},()=>C.zero());
+    const errCurve = [];
+    // Capture weight vector at ~60 evenly-spaced snapshots for animation
+    const N_FRAMES = 60;
+    const wHistory = []; // [{snap, w_copy, roots}]
+    const histInterval = Math.max(1, Math.floor(snapshots/N_FRAMES));
 
-    // ── 2. Yi matrix [I × (N+1)²] — COMPLEX (using complex SH Ylm) ──
-    // MATLAB Ylm is complex: Y_n^m = K * P_n^|m|(cosθ) * exp(imφ)
-    const cols = (N+1)*(N+1);
-    // Yi [I][cols] complex
-    const Yi = [];
-    for(let c=0;c<I;c++){
-      const row = [];
-      for(let n=0;n<=N;n++)
-        for(let mm=-n;mm<=n;mm++)
-          row.push(Ylm_complex(n, mm, sensors[c].theta, sensors[c].phi));
-      Yi.push(row);
-    }
+    for(let t=0;t<snapshots;t++){
+      const src = Array.from({length:K},()=>randcn());
+      const x = Array.from({length:M},(_,m)=>{
+        let v=C.zero();
+        thetaSrc.forEach((th,k)=>v=C.add(v,C.mul(steeringVec(M,th)[m],src[k])));
+        return C.add(v,C.scale(randcn(),noise_std));
+      });
 
-    // ── 3. B diagonal (complex): b(col) = 4π*(i)^n * j_n(π/2) ──
-    const bDiag = [];
-    for(let n=0;n<=N;n++){
-      const jn = sphBesselJ(n, Math.PI/2);
-      const bn = C.scale(ipow(n), 4*Math.PI*jn);
-      for(let mm=-n;mm<=n;mm++) bDiag.push(bn);
-    }
+      const x0 = x[0];
+      const xBar = x.slice(1);
 
-    // ── 4. eta = inv(B) * Yi' * Gamma  [cols × I] complex ──
-    // MATLAB: Yi' = conjugate transpose → eta[k][i] = conj(Yi[i][k]) / bDiag[k] * (4π/I)
-    const gammaScale = 4*Math.PI/I;
-    const eta = [];
-    for(let k=0;k<cols;k++){
-      const bInv = cdiv(C.one(), bDiag[k]);
-      const row = [];
-      for(let i=0;i<I;i++){
-        row.push(C.scale(C.mul(bInv, C.conj(Yi[i][k])), gammaScale));
+      let y=C.zero();
+      w.forEach((wk,k)=>y=C.add(y,C.mul(C.conj(wk),xBar[k])));
+
+      const e = C.sub(x0,y);
+      errCurve.push(C.abs2(e));
+
+      w = w.map((wk,k)=>C.add(wk,C.scale(C.mul(C.conj(e),xBar[k]),2*mu)));
+
+      // Capture snapshot for animation
+      if(t===0 || (t+1)%histInterval===0 || t===snapshots-1){
+        const wFull_snap = [C.one(), ...w.map(wk=>({r:-wk.r,i:-wk.i}))];
+        const coeffs_snap = [...wFull_snap.map(v=>C.conj(v))].reverse();
+        const roots_snap = polyRoots(coeffs_snap);
+        // Extract DOA estimates from signal roots (K closest to unit circle)
+        const sorted_snap=[...roots_snap].sort((a,b)=>Math.abs(C.abs(a)-1)-Math.abs(C.abs(b)-1));
+        const sigRoots_snap=sorted_snap.slice(0,K);
+        const estAngles_snap=sigRoots_snap.map(r=>{
+          const sinT=Math.max(-1,Math.min(1,C.angle(r)/Math.PI));
+          return Math.asin(sinT)*180/Math.PI;
+        }).sort((a,b)=>a-b);
+        wHistory.push({snap:t+1, roots:roots_snap, sigRoots:sigRoots_snap, estAngles:estAngles_snap});
       }
-      eta.push(row);
     }
 
-    // ── 5. Grid ──
-    const phiGrid = Array.from({length:3600},(_,k) => k*2*Math.PI/3600);
-    const gridLen = phiGrid.length;
+    // ── Full weight vector: w_full = [1; -w] ──
+    const wFull = [C.one(), ...w.map(wk=>({r:-wk.r,i:-wk.i}))];
 
-    // Y_grid [gridLen][cols] complex  (theta=π/2 for equatorial plane)
-    const Y_grid = phiGrid.map(ph => {
-      const row = [];
-      for(let n=0;n<=N;n++)
-        for(let mm=-n;mm<=n;mm++)
-          row.push(Ylm_complex(n, mm, Math.PI/2, ph));
-      return row;
+    // ── Spatial Spectrum ──
+    const NGRID = 1801;
+    const thetaGrid = Array.from({length:NGRID},(_,g)=>(-90+g*180/(NGRID-1))*Math.PI/180);
+    const spectrum = thetaGrid.map(th=>{
+      const aG = steeringVec(M,th);
+      let dot=C.zero();
+      wFull.forEach((wk,m)=>dot=C.add(dot,C.mul(C.conj(wk),aG[m])));
+      const mag=C.abs(dot);
+      return mag<1e-12?120:20*Math.log10(1/mag);
     });
 
-    // Anm_grid = Y_grid^T  [cols × gridLen] complex
-    // Anm_grid[k][g] = Y_grid[g][k]
-    // (In MATLAB: Anm_grid = Y_grid' — conjugate transpose! theta=pi/2 so real anyway)
-
-    // modes = [-(M-1)/2 ... (M-1)/2]
-    const modes = Array.from({length:M},(_,k)=>k-(M-1)/2);
-
-    // D_S_grid [M × gridLen] complex: exp(1i*mode*phi_g)  — matches MATLAB
-    const D_S_grid = modes.map(mode => phiGrid.map(ph => C.exp(0, mode*ph)));
-
-    // ── 6. G = Anm_grid * D_S_grid' * inv(D_S_grid * D_S_grid')  [cols × M] ──
-    // Use plain Y_grid[g][k] (not conjugate) so W1 roots land at exp(-i*phi_src)
-    // matching MATLAB's mod(-angle(roots), 2pi) extraction convention
-    const G = Array.from({length:cols},()=>Array.from({length:M},()=>C.zero()));
-    for(let k=0;k<cols;k++)
-      for(let m=0;m<M;m++)
-        for(let g=0;g<gridLen;g++)
-          G[k][m] = C.add(G[k][m], C.scale(C.mul(Y_grid[g][k], C.conj(D_S_grid[m][g])), 1/gridLen));
-
-    // ── 7. G_hash = inv(G^H * G) * G^H  [M × cols] complex (exact pseudo-inverse) ──
-    // G^H [M × cols]: G_H[m][k] = conj(G[k][m])
-    // G^H * G [M × M] complex
-    const GHG = Array.from({length:M},()=>Array.from({length:M},()=>C.zero()));
-    for(let a=0;a<M;a++)
-      for(let b=0;b<M;b++)
-        for(let k=0;k<cols;k++)
-          GHG[a][b] = C.add(GHG[a][b], C.mul(C.conj(G[k][a]), G[k][b]));
-
-    // inv(GHG) via Gauss-Jordan for M×M complex matrix
-    function invComplexMat(A){
-      const n = A.length;
-      // Augment with identity
-      const aug = A.map((row,i)=>row.map(v=>({...v})).concat(
-        Array.from({length:n},(_,j)=>j===i?C.one():C.zero())
-      ));
-      for(let col=0;col<n;col++){
-        // Find pivot
-        let pivR=col;
-        for(let r=col+1;r<n;r++)
-          if(C.abs(aug[r][col])>C.abs(aug[pivR][col])) pivR=r;
-        [aug[col],aug[pivR]]=[aug[pivR],aug[col]];
-        const piv=aug[col][col];
-        const pivAbs2=C.abs2(piv);
-        if(pivAbs2<1e-30) continue;
-        const pivInv={r:piv.r/pivAbs2,i:-piv.i/pivAbs2};
-        for(let c=0;c<2*n;c++) aug[col][c]=C.mul(aug[col][c],pivInv);
-        for(let r=0;r<n;r++){
-          if(r===col) continue;
-          const f=aug[r][col];
-          for(let c=0;c<2*n;c++) aug[r][c]=C.sub(aug[r][c],C.mul(f,aug[col][c]));
-        }
-      }
-      return aug.map(row=>row.slice(n));
-    }
-
-    const GHG_inv = invComplexMat(GHG);
-
-    // G_hash = GHG_inv * G^H  [M × cols]
-    const G_hash = Array.from({length:M},()=>Array.from({length:cols},()=>C.zero()));
-    for(let a=0;a<M;a++)
-      for(let k=0;k<cols;k++)
-        for(let b=0;b<M;b++)
-          G_hash[a][k] = C.add(G_hash[a][k], C.mul(GHG_inv[a][b], C.conj(G[k][b])));
-
-    // ── 8. Signal simulation + NLMS ──
-    const noise_std = Math.pow(10, -snrDb/20);
-    let W = Array.from({length:M-1},()=>C.zero()); // row vector W [1 × M-1]
-    const errCurve = [];
-
-    for(let snap=0;snap<snapshots;snap++){
-      // Source: (randn + 1i*randn)/sqrt(2)  [DD]
-      const src = Array.from({length:DD},()=>randcn());
-
-      // x_S = a_S * source + noise_std * noise  [I]
-      const x = Array.from({length:I},()=>C.zero());
-      for(let i=0;i<I;i++){
-        for(let j=0;j<DD;j++){
-          const phase = Math.PI/2 * Math.sin(sensors[i].theta) * Math.cos(phiSrc[j]-sensors[i].phi);
-          x[i] = C.add(x[i], C.mul(C.exp(0,phase), src[j]));
-        }
-        x[i] = C.add(x[i], C.scale(randcn(), noise_std));
-      }
-
-      // Dnm = eta * x  [cols complex]
-      const Dnm = eta.map(row => row.reduce((acc,e,ii)=>C.add(acc,C.mul(e,x[ii])),C.zero()));
-
-      // z_hat = G_hash * Dnm  [M complex]
-      const z = G_hash.map(row => row.reduce((acc,g,k)=>C.add(acc,C.mul(g,Dnm[k])),C.zero()));
-
-      // NLMS: y = W * z(2:M),  e = z(1) - y
-      // delta = z(2:M)' * e   →  conj(z[k]) * e
-      // W = W + mu/(z(2:M)^H * z(2:M)) * delta
-      const zInp = z.slice(1); // z(2:M)
-      let y = C.zero();
-      for(let k=0;k<W.length;k++) y = C.add(y, C.mul(W[k], zInp[k]));
-      const e = C.sub(z[0], y);
-      const pow = zInp.reduce((s,v)=>s+C.abs2(v),0)+1e-8;
-      // delta = zInp' * e = conj(zInp[k]) * e
-      W = W.map((w,k)=>C.add(w, C.scale(C.mul(C.conj(zInp[k]),e), mu/pow)));
-      errCurve.push(C.abs(e));
-    }
-
-    // ── 9. Build W1 = [1; -W],  coeff = flipud(conj(W1)) ──
-    // W1 = [1; -W]  (column vector, index 0 = first element)
-    const W1 = [C.one(), ...W.map(w=>({r:-w.r, i:-w.i}))];
-
-    // MATLAB: coeff = flipud(conj(W1))
-    // flipud reverses the vector, conj takes conjugate of each element
-    // polyRoots expects coeffs[0]=constant, coeffs[n]=leading
-    // W1 is degree-(M-1) poly: W1[0]*z^0 + W1[1]*z^1 + ... + W1[M-1]*z^(M-1)
-    // flipud(conj(W1)) reverses to: conj(W1[M-1])*z^0 + ... + conj(W1[0])*z^(M-1)
-    const coeffs = [...W1].reverse().map(w => C.conj(w));
-
-    // ── 10. Root finding ──
+    // ── Root finding ──
+    const wConj = wFull.map(w=>C.conj(w));
+    const coeffs = [...wConj].reverse();
     const allRoots = polyRoots(coeffs);
 
-    // Select DD roots closest to unit circle
-    const sorted = [...allRoots].sort((a,b)=>Math.abs(C.abs(a)-1)-Math.abs(C.abs(b)-1));
-    const sigRoots  = sorted.slice(0,DD);
-    const noiseRoots= sorted.slice(DD);
+    const sorted = [...allRoots].sort((a,b)=>
+      Math.abs(C.abs(a)-1)-Math.abs(C.abs(b)-1)
+    );
+    const sigRoots = sorted.slice(0,K);
 
-    // theta_est = mod(-angle(sig_roots), 2*pi) — matches MATLAB exactly
-    const thetaEst = sigRoots
-      .map(r => {
-        const a = -C.angle(r);
-        return (((a * 180/Math.PI) % 360) + 360) % 360;
-      })
-      .sort((a,b) => a-b);
+    const thetaEstRad = sigRoots.map(r=>{
+      const sinT=+C.angle(r)/Math.PI;
+      return Math.asin(Math.max(-1,Math.min(1,sinT)));
+    }).sort((a,b)=>a-b);
+    const thetaEstDeg = thetaEstRad.map(r=>r*180/Math.PI);
 
     const trueAngles = [...sourceAngles].sort((a,b)=>a-b);
-    const rmse = Math.sqrt(thetaEst.reduce((s,v,k)=>s+(v-trueAngles[k])**2,0)/DD);
+    const rmse = Math.sqrt(thetaEstDeg.reduce((s,v,k)=>s+(v-trueAngles[k])**2,0)/K);
 
-    return { thetaEst, trueAngles, rmse, errCurve, allRoots, sigRoots, noiseRoots, sensors };
+    return {thetaEstDeg,trueAngles,rmse,errCurve,wHistory,allRoots,sigRoots,spectrum,thetaGrid,wFull,M,K,sourceAngles};
   }
 
-  // ── CANVAS DRAWING ───────────────────────────────────────────────────────
-  function drawArray3D(canvas, sensors, sourceAngles){
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
-    const cx = W/2, cy = H/2, R = W*0.36;
+  // ── DRAW ULA ─────────────────────────────────────────────────────────────────
+  const SRC_COLORS=['#3b7dd8','#e05c2f','#2ea86e','#c04080'];
+
+
+  // ── STATIC ULA DRAW (no animation needed for panel) ──────────────────────────
+  let ulaAnimId=null;
+
+  function drawULAStatic(canvas, M, sourceAngles){
+    const W=canvas.width, H=canvas.height;
+    const ctx=canvas.getContext('2d');
     ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = '#f5f3ed'; ctx.fillRect(0,0,W,H);
 
-    let rotY = Date._doaRot || 0;
-    Date._doaRot = rotY;
+    const ink  = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#1a1a1a';
+    const muted= getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#888';
+    const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#3b7dd8';
 
-    function rot(x,y,z){
-      const x1 = x*Math.cos(rotY)+z*Math.sin(rotY), z1=-x*Math.sin(rotY)+z*Math.cos(rotY);
-      return {x:x1,y,z:z1};
+    // Transparent bg (page bg canvas shows through)
+    ctx.clearRect(0,0,W,H);
+
+    const cx=W/2, cy=H/2+10;
+    const arrayLen=Math.min(W,H)*0.72;
+    const spacing=arrayLen/(M-1);
+
+    // Axis line
+    ctx.strokeStyle=muted+'55'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(cx-arrayLen/2-14,cy); ctx.lineTo(cx+arrayLen/2+14,cy);
+    ctx.stroke(); ctx.setLineDash([]);
+
+    // Sensors
+    for(let m=0;m<M;m++){
+      const x=cx-arrayLen/2+m*spacing;
+      ctx.fillStyle=accent;
+      ctx.beginPath(); ctx.arc(x,cy,m===0?5:3.5,0,2*Math.PI); ctx.fill();
+      if(m===0){
+        ctx.strokeStyle=ink; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(x,cy,7,0,2*Math.PI); ctx.stroke();
+      }
     }
-    function proj(x,y,z){ const s=520/(520+z+380); return {x:cx+x*R*s,y:cy-y*R*s,z}; }
+
+    // Source arrows
+    const arrowLen=Math.min(W,H)*0.30;
+    sourceAngles.forEach((deg,k)=>{
+      const th=deg*Math.PI/180;
+      const dx=Math.sin(th)*arrowLen, dy=-Math.cos(th)*arrowLen;
+      const ax=cx+dx, ay=cy+dy;
+      ctx.strokeStyle=SRC_COLORS[k%4]; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(ax,ay); ctx.stroke();
+      const headAng=Math.atan2(dy,dx);
+      ctx.fillStyle=SRC_COLORS[k%4];
+      ctx.beginPath();
+      ctx.moveTo(ax,ay);
+      ctx.lineTo(ax-10*Math.cos(headAng-0.38),ay-10*Math.sin(headAng-0.38));
+      ctx.lineTo(ax-10*Math.cos(headAng+0.38),ay-10*Math.sin(headAng+0.38));
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle=SRC_COLORS[k%4]; ctx.font='bold 11px monospace';
+      ctx.fillText(`S${k+1} ${deg>=0?'+':''}${deg}°`,ax+6,ay+4);
+    });
+
+    ctx.fillStyle=muted; ctx.font='10px monospace';
+    ctx.fillText(`M=${M} sensors`,6,16);
+  }
+
+  function startULAAnimation(canvas, M, sourceAngles){
+    if(ulaAnimId) cancelAnimationFrame(ulaAnimId);
+    drawULAStatic(canvas, M, sourceAngles); // static — no loop needed
+  }
+
+
+
+  // ── DRAW SPATIAL SPECTRUM ─────────────────────────────────────────────────────
+  function drawSpectrum(canvas, thetaGrid, spectrum, sourceAngles){
+    const W=canvas.width, H=canvas.height;
+    const ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+
+    const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0a0a09';
+    const ink=getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#1a1a1a';
+    const muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#888';
+    const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#3b7dd8';
+
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+    const pad={l:44,r:16,t:16,b:34};
+    const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+
+    const specMax=Math.max(...spectrum);
+    const specMin=Math.max(specMax-50, Math.min(...spectrum));
+    const yRange=specMax-specMin||1;
 
     // Grid
-    for(let lat=-60;lat<=60;lat+=30){
-      const latR=lat*Math.PI/180; const pts=[];
-      for(let i=0;i<=36;i++){const lon=2*Math.PI*i/36; const r=rot(Math.cos(latR)*Math.cos(lon),Math.sin(latR),Math.cos(latR)*Math.sin(lon)); pts.push(proj(r.x,r.y,r.z));}
-      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-      ctx.strokeStyle='rgba(45,90,61,0.12)'; ctx.lineWidth=0.7; ctx.stroke();
+    ctx.strokeStyle=muted+'33'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    for(let v=0;v<=4;v++){
+      const y=pad.t+ph*(1-v/4);
+      ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
+      ctx.fillStyle=muted; ctx.font='9px monospace'; ctx.textAlign='right';
+      ctx.fillText((specMin+v/4*yRange).toFixed(0),pad.l-4,y+3);
     }
-    for(let lon=0;lon<360;lon+=45){
-      const lonR=lon*Math.PI/180; const pts=[];
-      for(let i=0;i<=36;i++){const lat=Math.PI*i/36-Math.PI/2; const r=rot(Math.cos(lat)*Math.cos(lonR),Math.sin(lat),Math.cos(lat)*Math.sin(lonR)); pts.push(proj(r.x,r.y,r.z));}
-      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-      ctx.strokeStyle='rgba(45,90,61,0.12)'; ctx.lineWidth=0.7; ctx.stroke();
+    for(let ang=-90;ang<=90;ang+=30){
+      const x=pad.l+pw*(ang+90)/180;
+      ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
+      ctx.fillStyle=muted; ctx.font='9px monospace'; ctx.textAlign='center';
+      ctx.fillText(ang+'°',x,pad.t+ph+12);
     }
+    ctx.setLineDash([]);
 
-    // Sensors sorted back→front
-    const projected = sensors.map(s=>{
-      const r=rot(s.x,s.z,s.y);
-      return {...proj(r.x,r.y,r.z), phi:s.phi, theta:s.theta};
-    }).sort((a,b)=>a.z-b.z);
-
-    projected.forEach(p=>{
-      const depth=(p.z+1)/2;
-      const rad=Math.max(0.5, 2+2.5*depth);
-      const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,rad*3);
-      g.addColorStop(0,`rgba(70,130,220,${0.2*depth})`);
-      g.addColorStop(1,'rgba(70,130,220,0)');
-      ctx.beginPath(); ctx.arc(p.x,p.y,rad*3,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
-      ctx.beginPath(); ctx.arc(p.x,p.y,rad,0,Math.PI*2);
-      ctx.fillStyle=`rgba(70,130,220,${0.3+0.7*depth})`; ctx.fill();
+    // True source lines
+    sourceAngles.forEach((deg,k)=>{
+      const x=pad.l+pw*(deg+90)/180;
+      ctx.strokeStyle=SRC_COLORS[k%4]+'88'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=SRC_COLORS[k%4]; ctx.font='9px monospace'; ctx.textAlign='center';
+      ctx.fillText(`S${k+1}`,x,pad.t+12);
     });
 
-    // Source direction arrows
-    const colors=['#e05252','#e09b2d','#7b52e0','#52b0e0'];
-    sourceAngles.forEach((phi,k)=>{
-      const phiR=phi*Math.PI/180;
-      const ux=Math.cos(phiR), uy=0, uz=Math.sin(phiR);
-      const r=rot(ux,uy,uz); const p=proj(r.x*1.35,r.y*1.35,r.z*1.35);
-      const p0=proj(0,0,0);
-      ctx.beginPath(); ctx.moveTo(p0.x,p0.y); ctx.lineTo(p.x,p.y);
-      ctx.strokeStyle=colors[k%colors.length]+'cc'; ctx.lineWidth=1.5;
-      ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
-      ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2);
-      ctx.fillStyle=colors[k%colors.length]; ctx.fill();
-      ctx.fillStyle=colors[k%colors.length];
-      ctx.font="bold 10px 'DM Mono',monospace";
-      ctx.fillText(`S${k+1}:${phi}°`,p.x+6,p.y-4);
+    // Spectrum line
+    ctx.beginPath(); ctx.strokeStyle=accent; ctx.lineWidth=1.8;
+    thetaGrid.forEach((th,g)=>{
+      const x=pad.l+pw*(th*180/Math.PI+90)/180;
+      const y=pad.t+ph*(1-(spectrum[g]-specMin)/yRange);
+      g===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
     });
+    ctx.stroke();
 
-    // Axis label
-    ctx.fillStyle='rgba(107,107,96,0.6)'; ctx.font="9px 'DM Mono',monospace";
-    ctx.fillText('Azimuth plane', cx-30, H-6);
+    // Axes labels
+    ctx.fillStyle=muted; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillText('θ (degrees)',W/2,H-4);
+    ctx.save(); ctx.translate(10,H/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('LMS Spectrum (dB)',0,0); ctx.restore();
   }
 
-  function drawRootPlot(canvas, allRoots, sigRoots){
-    const ctx = canvas.getContext('2d');
+  // ── DRAW ROOT PLOT ────────────────────────────────────────────────────────────
+  function drawRootPlot(canvas, allRoots, sigRoots, sourceAngles){
     const W=canvas.width, H=canvas.height;
-    const cx=W/2, cy=H/2;
-    const scale=Math.min(W,H)*0.28;
+    const ctx=canvas.getContext('2d');
     ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#f5f3ed'; ctx.fillRect(0,0,W,H);
 
-    // Grid lines
-    ctx.strokeStyle='rgba(0,0,0,0.08)'; ctx.lineWidth=0.8;
-    ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+    const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0a0a09';
+    const ink=getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#1a1a1a';
+    const muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#888';
+    const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#3b7dd8';
 
-    // Tick labels
-    ctx.fillStyle='rgba(107,107,96,0.7)'; ctx.font="8px 'DM Mono',monospace";
-    ctx.fillText('Re',W-18,cy-4); ctx.fillText('Im',cx+4,10);
-    [-1,1].forEach(v=>{
-      ctx.fillText(v,cx+v*scale-4,cy+10);
-      ctx.beginPath(); ctx.moveTo(cx+v*scale,cy-3); ctx.lineTo(cx+v*scale,cy+3);
-      ctx.stroke();
-    });
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+    const cx=W/2, cy=H/2;
+    const R=Math.min(W,H)*0.37;
+
+    // Axes
+    ctx.strokeStyle=muted+'44'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(cx-R-20,cy); ctx.lineTo(cx+R+20,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx,cy-R-20); ctx.lineTo(cx,cy+R+20); ctx.stroke();
+    ctx.setLineDash([]);
 
     // Unit circle
-    ctx.beginPath(); ctx.arc(cx,cy,scale,0,2*Math.PI);
-    ctx.strokeStyle='rgba(45,90,61,0.55)'; ctx.lineWidth=1.2; ctx.stroke();
+    ctx.strokeStyle=muted; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.stroke();
 
-    // Build set of signal root keys
-    const sigSet = new Set(sigRoots.map(r=>`${r.r.toFixed(6)},${r.i.toFixed(6)}`));
-
-    // Noise roots
-    allRoots.forEach(r=>{
-      const key=`${r.r.toFixed(6)},${r.i.toFixed(6)}`;
-      if(sigSet.has(key)) return;
-      const px=cx+r.r*scale, py=cy-r.i*scale;
-      ctx.beginPath();
-      ctx.moveTo(px-4,py-4); ctx.lineTo(px+4,py+4);
-      ctx.moveTo(px+4,py-4); ctx.lineTo(px-4,py+4);
-      ctx.strokeStyle='rgba(30,30,30,0.7)'; ctx.lineWidth=1.5; ctx.stroke();
+    // True DOA locations on unit circle: roots at exp(+j*pi*sin(θ))
+    sourceAngles.forEach((deg,k)=>{
+      const sinT=Math.sin(deg*Math.PI/180);
+      const ang=+Math.PI*sinT;
+      const rx=cx+R*Math.cos(ang), ry=cy+R*Math.sin(ang);
+      ctx.strokeStyle=SRC_COLORS[k%4]; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(rx,ry,7,0,2*Math.PI); ctx.stroke();
+      ctx.fillStyle=SRC_COLORS[k%4]; ctx.font='bold 9px monospace';
+      ctx.textAlign='center';
+      ctx.fillText(`S${k+1}`,rx,ry-11);
     });
 
-    // Signal roots
-    sigRoots.forEach(r=>{
-      const px=cx+r.r*scale, py=cy-r.i*scale;
-      ctx.beginPath();
-      ctx.moveTo(px-5,py-5); ctx.lineTo(px+5,py+5);
-      ctx.moveTo(px+5,py-5); ctx.lineTo(px-5,py+5);
-      ctx.strokeStyle='#e05252'; ctx.lineWidth=2.5; ctx.stroke();
-      ctx.beginPath(); ctx.arc(px,py,5,0,2*Math.PI);
-      ctx.strokeStyle='#e05252'; ctx.lineWidth=1.5; ctx.stroke();
-      const ang=((-Math.atan2(r.i,r.r)%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
-      ctx.fillStyle='#c03030'; ctx.font="bold 9px 'DM Mono',monospace";
-      ctx.fillText(`${(ang*180/Math.PI).toFixed(1)}°`,px+7,py-5);
+    // Noise roots (black *)
+    const sigSet=new Set(sigRoots);
+    allRoots.forEach(r=>{
+      if(sigSet.has(r)) return;
+      const rx=cx+r.r*R, ry=cy+r.i*R;
+      ctx.fillStyle=ink+'bb'; ctx.font='bold 14px monospace'; ctx.textAlign='center';
+      ctx.fillText('×',rx,ry+5);
+    });
+
+    // Signal roots (colored *)
+    sigRoots.forEach((r,k)=>{
+      const rx=cx+r.r*R, ry=cy+r.i*R;
+      ctx.fillStyle=SRC_COLORS[k%4]; ctx.font='bold 15px monospace'; ctx.textAlign='center';
+      ctx.fillText('★',rx,ry+5);
+      // Line from root to true location
+      const sinT=Math.sin(sourceAngles.sort((a,b)=>a-b)[k]*Math.PI/180);
+      const trueAng=+Math.PI*sinT;
+      const tx=cx+R*Math.cos(trueAng), ty=cy+R*Math.sin(trueAng);
+      ctx.strokeStyle=SRC_COLORS[k%4]+'66'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(rx,ry); ctx.lineTo(tx,ty); ctx.stroke();
+      ctx.setLineDash([]);
     });
 
     // Legend
-    ctx.strokeStyle='rgba(30,30,30,0.6)'; ctx.lineWidth=1.2;
-    ctx.beginPath(); ctx.moveTo(8,H-22); ctx.lineTo(14,H-16); ctx.moveTo(14,H-22); ctx.lineTo(8,H-16); ctx.stroke();
-    ctx.fillStyle='rgba(30,30,30,0.6)'; ctx.font="8px 'DM Mono',monospace"; ctx.fillText('noise roots',18,H-17);
-    ctx.strokeStyle='#e05252'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(8,H-8); ctx.lineTo(14,H-2); ctx.moveTo(14,H-8); ctx.lineTo(8,H-2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(11,H-5,4,0,2*Math.PI); ctx.stroke();
-    ctx.fillStyle='#e05252'; ctx.fillText('signal roots',18,H-4);
+    ctx.fillStyle=muted; ctx.font='9px monospace'; ctx.textAlign='left';
+    ctx.fillText('○ True DOA',6,H-30);
+    ctx.fillStyle=ink; ctx.fillText('× Noise roots',6,H-18);
+    ctx.fillStyle=SRC_COLORS[0]; ctx.fillText('★ Signal roots',6,H-6);
   }
 
-
-  function drawConvergence(canvas, errCurve){
-    const ctx=canvas.getContext('2d');
+  // ── DRAW MSE CURVE ────────────────────────────────────────────────────────────
+  function drawMSE(canvas, errCurve){
     const W=canvas.width, H=canvas.height;
-    const pad={l:36,r:12,t:12,b:28};
-    const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+    const ctx=canvas.getContext('2d');
     ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#f5f3ed'; ctx.fillRect(0,0,W,H);
 
-    // Smooth curve
-    const smooth=[];
-    const win=10;
-    for(let i=0;i<errCurve.length;i++){
-      let s=0,c=0;
-      for(let j=Math.max(0,i-win);j<=Math.min(errCurve.length-1,i+win);j++){s+=errCurve[j];c++;}
-      smooth.push(s/c);
-    }
-    const maxE=Math.max(...smooth,1e-6);
+    const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0a0a09';
+    const muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#888';
+    const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#3b7dd8';
+
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+    const pad={l:44,r:12,t:14,b:34};
+    const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+
+    // Convert to dB
+    const dB=errCurve.map(v=>v<1e-20?-200:10*Math.log10(v));
+    const dBmax=Math.max(...dB.filter(v=>isFinite(v)))+3;
+    const dBmin=Math.min(...dB.filter(v=>isFinite(v)))-3;
+    const yRange=dBmax-dBmin||1;
 
     // Grid
-    ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.8;
-    for(let k=0;k<=4;k++){
-      const y=pad.t+ph*k/4;
+    ctx.strokeStyle=muted+'33'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    for(let v=0;v<=4;v++){
+      const y=pad.t+ph*(1-v/4);
       ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
-      const val=(maxE*(1-k/4)).toFixed(2);
-      ctx.fillStyle='rgba(107,107,96,0.7)'; ctx.font="8px 'DM Mono',monospace";
-      ctx.fillText(val,2,y+3);
+      ctx.fillStyle=muted; ctx.font='9px monospace'; ctx.textAlign='right';
+      ctx.fillText((dBmin+v/4*yRange).toFixed(0),pad.l-4,y+3);
     }
-    for(let k=0;k<=4;k++){
-      const x=pad.l+pw*k/4;
+    const NTICKS=6;
+    for(let t=0;t<=NTICKS;t++){
+      const x=pad.l+pw*t/NTICKS;
       ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
-      ctx.fillStyle='rgba(107,107,96,0.7)'; ctx.font="8px 'DM Mono',monospace";
-      ctx.fillText(Math.round(errCurve.length*k/4),x-8,pad.t+ph+14);
+      ctx.fillStyle=muted; ctx.font='9px monospace'; ctx.textAlign='center';
+      ctx.fillText(Math.round(t/NTICKS*errCurve.length),x,pad.t+ph+12);
     }
+    ctx.setLineDash([]);
 
-    // Curve fill
-    ctx.beginPath();
-    smooth.forEach((v,i)=>{
-      const x=pad.l+pw*i/smooth.length;
-      const y=pad.t+ph*(1-v/maxE);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    // Curve
+    ctx.beginPath(); ctx.strokeStyle=accent; ctx.lineWidth=1.5;
+    dB.forEach((v,g)=>{
+      const x=pad.l+pw*g/(dB.length-1);
+      const y=pad.t+ph*(1-(v-dBmin)/yRange);
+      g===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
     });
-    ctx.lineTo(pad.l+pw,pad.t+ph); ctx.lineTo(pad.l,pad.t+ph); ctx.closePath();
-    const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ph);
-    grad.addColorStop(0,'rgba(45,90,61,0.25)'); grad.addColorStop(1,'rgba(45,90,61,0.02)');
-    ctx.fillStyle=grad; ctx.fill();
-
-    ctx.beginPath();
-    smooth.forEach((v,i)=>{
-      const x=pad.l+pw*i/smooth.length;
-      const y=pad.t+ph*(1-v/maxE);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.strokeStyle='rgba(45,90,61,0.9)'; ctx.lineWidth=1.8; ctx.stroke();
-
-    ctx.fillStyle='rgba(107,107,96,0.8)'; ctx.font="8px 'DM Mono',monospace";
-    ctx.fillText('Iteration →',pad.l+pw/2-20,pad.t+ph+22);
-    ctx.save(); ctx.translate(10,pad.t+ph/2+20); ctx.rotate(-Math.PI/2);
-    ctx.fillText('|error|',0,0); ctx.restore();
-  }
-
-  // ── ROOT PLOT ─────────────────────────────────────────────────────────────
-  function drawRootPlot(canvas, allRoots, sigRoots, trueAngles){
-    const ctx=canvas.getContext('2d');
-    const W=canvas.width, H=canvas.height, cx=W/2, cy=H/2;
-    const R=Math.min(W,H)*0.38;
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#f5f3ed'; ctx.fillRect(0,0,W,H);
-
-    // Axis lines
-    ctx.strokeStyle='rgba(0,0,0,0.08)'; ctx.lineWidth=0.8;
-    ctx.beginPath(); ctx.moveTo(cx-R*1.25,cy); ctx.lineTo(cx+R*1.25,cy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx,cy-R*1.25); ctx.lineTo(cx,cy+R*1.25); ctx.stroke();
-
-    // Unit circle
-    ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI);
-    ctx.strokeStyle='rgba(45,90,61,0.35)'; ctx.lineWidth=1.2; ctx.stroke();
-
-    // True DOA radial lines
-    const colors=['#e05252','#e09b2d','#7b52e0','#52b0e0'];
-    trueAngles.forEach((phi,k)=>{
-      const phiR=phi*Math.PI/180;
-      // MATLAB: root is at exp(-i*phi), so on unit circle at angle -phi
-      const rx=cx+R*Math.cos(-phiR), ry=cy+R*Math.sin(-phiR);
-      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(rx,ry);
-      ctx.strokeStyle=colors[k%colors.length]+'55'; ctx.lineWidth=1;
-      ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
-      // True DOA dot on unit circle
-      ctx.beginPath(); ctx.arc(rx,ry,5,0,2*Math.PI);
-      ctx.fillStyle=colors[k%colors.length]; ctx.fill();
-      // Label
-      const lx=cx+(R+18)*Math.cos(-phiR), ly=cy+(R+18)*Math.sin(-phiR);
-      ctx.fillStyle=colors[k%colors.length];
-      ctx.font="bold 9px 'DM Mono',monospace";
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(phi+'°',lx,ly);
-    });
-
-    // Noise roots
-    const sigSet=new Set(sigRoots.map(r=>r));
-    allRoots.forEach(r=>{
-      if(sigRoots.includes(r)) return;
-      const x=cx+r.r*R, y=cy+r.i*R;
-      ctx.beginPath(); ctx.arc(x,y,3.5,0,2*Math.PI);
-      ctx.fillStyle='rgba(100,100,100,0.45)'; ctx.fill();
-    });
-
-    // Signal roots
-    sigRoots.forEach((r,k)=>{
-      const x=cx+r.r*R, y=cy+r.i*R;
-      // Glow
-      const g=ctx.createRadialGradient(x,y,0,x,y,10);
-      g.addColorStop(0,colors[k%colors.length]+'88'); g.addColorStop(1,'transparent');
-      ctx.beginPath(); ctx.arc(x,y,10,0,2*Math.PI); ctx.fillStyle=g; ctx.fill();
-      // Core
-      ctx.beginPath(); ctx.arc(x,y,5,0,2*Math.PI);
-      ctx.fillStyle=colors[k%colors.length]; ctx.fill();
-      ctx.strokeStyle='#fff'; ctx.lineWidth=1.2; ctx.stroke();
-      // Line from root to unit circle
-      const mag=Math.sqrt(r.r*r.r+r.i*r.i)||1;
-      const ux=cx+R*r.r/mag, uy=cy+R*r.i/mag;
-      ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(ux,uy);
-      ctx.strokeStyle=colors[k%colors.length]+'99'; ctx.lineWidth=1;
-      ctx.setLineDash([2,2]); ctx.stroke(); ctx.setLineDash([]);
-    });
+    ctx.stroke();
 
     // Labels
-    ctx.fillStyle='rgba(107,107,96,0.7)'; ctx.font="8px 'DM Mono',monospace";
-    ctx.textAlign='left'; ctx.textBaseline='top';
-    ctx.fillText('● signal root   ● true DOA   ● noise root',4,4);
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('Re',cx+R*1.22,cy-8); ctx.fillText('Im',cx+6,cy-R*1.18);
+    ctx.fillStyle=muted; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillText('Snapshot',W/2,H-4);
+    ctx.save(); ctx.translate(10,H/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('|e|² (dB)',0,0); ctx.restore();
   }
 
-  // ── MSE CURVE ─────────────────────────────────────────────────────────────
-  function drawMSE(canvas, mseCurve, snapshots){
-    const ctx=canvas.getContext('2d');
+  // ── DRAW MSE up to frame f (for animation) ───────────────────────────────────
+  function drawMSEFrame(canvas, errCurve, dBmin, dBmax, upTo){
     const W=canvas.width, H=canvas.height;
-    const pad={l:46,r:12,t:16,b:32};
+    const ctx=canvas.getContext('2d');
+    const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0a0a09';
+    const muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#888';
+    const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#4aaf72';
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+    const pad={l:44,r:12,t:14,b:34};
     const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
-    ctx.clearRect(0,0,W,H); ctx.fillStyle='#f5f3ed'; ctx.fillRect(0,0,W,H);
-
-    const dB=mseCurve.map(v=>10*Math.log10(v+1e-12));
-    const minDB=Math.floor(Math.min(...dB)/5)*5;
-    const maxDB=Math.ceil(Math.max(...dB)/5)*5;
-    const rangeDB=maxDB-minDB||1;
-
+    const yRange=dBmax-dBmin||1;
+    const dB=errCurve.map(v=>v<1e-20?-200:10*Math.log10(v));
     // Grid
-    ctx.strokeStyle='rgba(0,0,0,0.07)'; ctx.lineWidth=0.8;
-    for(let db=minDB;db<=maxDB;db+=5){
-      const y=pad.t+ph*(1-(db-minDB)/rangeDB);
+    ctx.strokeStyle=muted+'33'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    for(let v=0;v<=4;v++){
+      const y=pad.t+ph*(1-v/4);
       ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
-      ctx.fillStyle='rgba(107,107,96,0.8)'; ctx.font="8px 'DM Mono',monospace";
-      ctx.textAlign='right'; ctx.fillText(db+'dB',pad.l-4,y+3);
+      ctx.fillStyle=muted; ctx.font='9px monospace'; ctx.textAlign='right';
+      ctx.fillText((dBmin+v/4*yRange).toFixed(0),pad.l-4,y+3);
     }
-    for(let k=0;k<=4;k++){
-      const x=pad.l+pw*k/4;
+    for(let t=0;t<=6;t++){
+      const x=pad.l+pw*t/6;
       ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
-      ctx.fillStyle='rgba(107,107,96,0.8)'; ctx.font="8px 'DM Mono',monospace";
-      ctx.textAlign='center'; ctx.fillText(Math.round(snapshots*k/4),x,pad.t+ph+14);
+      ctx.fillStyle=muted; ctx.font='9px monospace'; ctx.textAlign='center';
+      ctx.fillText(Math.round(t/6*errCurve.length),x,pad.t+ph+12);
     }
-
-    // Filled area
-    ctx.beginPath();
-    dB.forEach((v,i)=>{
-      const x=pad.l+pw*i/(dB.length-1);
-      const y=pad.t+ph*(1-(v-minDB)/rangeDB);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.lineTo(pad.l+pw,pad.t+ph); ctx.lineTo(pad.l,pad.t+ph); ctx.closePath();
-    const gr=ctx.createLinearGradient(0,pad.t,0,pad.t+ph);
-    gr.addColorStop(0,'rgba(45,90,61,0.3)'); gr.addColorStop(1,'rgba(45,90,61,0.02)');
-    ctx.fillStyle=gr; ctx.fill();
-
-    // Line
-    ctx.beginPath();
-    dB.forEach((v,i)=>{
-      const x=pad.l+pw*i/(dB.length-1);
-      const y=pad.t+ph*(1-(v-minDB)/rangeDB);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.strokeStyle='rgba(45,90,61,0.95)'; ctx.lineWidth=1.8; ctx.stroke();
-
-    // Axis labels
-    ctx.fillStyle='rgba(107,107,96,0.85)'; ctx.font="8px 'DM Mono',monospace";
-    ctx.textAlign='center'; ctx.fillText('Snapshot →',pad.l+pw/2,pad.t+ph+26);
-    ctx.save(); ctx.translate(10,pad.t+ph/2); ctx.rotate(-Math.PI/2);
-    ctx.fillText('MSE (dB)',0,0); ctx.restore();
-    ctx.textAlign='left'; ctx.fillText('avg over 500 MC trials',pad.l+4,pad.t+4);
+    ctx.setLineDash([]);
+    // Curve up to upTo
+    if(upTo>1){
+      ctx.beginPath(); ctx.strokeStyle=accent; ctx.lineWidth=1.5;
+      for(let g=0;g<upTo&&g<dB.length;g++){
+        const x=pad.l+pw*g/(dB.length-1);
+        const y=pad.t+ph*(1-(dB[g]-dBmin)/yRange);
+        g===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      // Playhead
+      const hx=pad.l+pw*(upTo-1)/(dB.length-1);
+      ctx.beginPath(); ctx.moveTo(hx,pad.t); ctx.lineTo(hx,pad.t+ph);
+      ctx.strokeStyle=accent+'88'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+    // Labels
+    ctx.fillStyle=muted; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillText('Snapshot',W/2,H-4);
+    ctx.save(); ctx.translate(10,H/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('|e|² (dB)',0,0); ctx.restore();
   }
 
-  // ── MONTE CARLO ───────────────────────────────────────────────────────────
-  function runMonteCarlo(params, onProgress, onDone){
-    const { numSources, micsPerRing, mu, snrDb, snapshots, sourceAngles } = params;
-    const MC=500;
-    const N=2,M=5,cols=9;
-    const modes=[-2,-1,0,1,2];
-    const phiSrcs=sourceAngles.map(d=>d*Math.PI/180);
-    const noise_std=Math.pow(10,-snrDb/20);
+  // ── DRAW ROOT PLOT from raw root array ────────────────────────────────────────
+  // ── DRAW ROOT EVOLUTION FRAME ─────────────────────────────────────────────────
+  function drawRootFrame(canvas, frame, K, sourceAngles, history){
+    const W=canvas.width, H=canvas.height;
+    const ctx=canvas.getContext('2d');
+    const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0a0a09';
+    const ink=getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#e8e6e0';
+    const muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#888';
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
 
-    // Pre-build array geometry (same for all trials)
-    const sensors=buildSensorPositions(micsPerRing);
-    const I=sensors.length;
+    const cx=W/2, cy=H/2, R=Math.min(W,H)*0.36;
 
-    const Yi=sensors.map(s=>{const row=[];for(let n=0;n<=N;n++)for(let m=-n;m<=n;m++)row.push(Ylm_complex(n,m,s.theta,s.phi));return row;});
-    const bDiag=[];for(let n=0;n<=N;n++){const bn=C.scale(ipow(n),4*Math.PI*sphBesselJ(n,Math.PI/2));for(let m=-n;m<=n;m++)bDiag.push(bn);}
-    const gS=4*Math.PI/I;
-    const eta=Array.from({length:cols},(_,k)=>Array.from({length:I},(_,i)=>C.scale(C.mul(cdiv(C.one(),bDiag[k]),C.conj(Yi[i][k])),gS)));
+    // Axes
+    ctx.strokeStyle=muted+'22'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(cx-R-14,cy); ctx.lineTo(cx+R+14,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx,cy-R-14); ctx.lineTo(cx,cy+R+14); ctx.stroke();
+    ctx.setLineDash([]);
 
-    const phiGrid=Array.from({length:3600},(_,g)=>g*2*Math.PI/3600);
-    const GL=phiGrid.length;
-    const Y_grid=phiGrid.map(ph=>{const row=[];for(let n=0;n<=N;n++)for(let m=-n;m<=n;m++)row.push(Ylm_complex(n,m,Math.PI/2,ph));return row;});
-    const D_S=modes.map(mode=>phiGrid.map(ph=>C.exp(0,mode*ph)));
-    const G=Array.from({length:cols},()=>Array.from({length:M},()=>C.zero()));
-    for(let k=0;k<cols;k++)for(let m=0;m<M;m++)for(let g=0;g<GL;g++)
-      G[k][m]=C.add(G[k][m],C.scale(C.mul(Y_grid[g][k],C.conj(D_S[m][g])),1/GL));
-    const GHG=Array.from({length:M},()=>Array.from({length:M},()=>C.zero()));
-    for(let a=0;a<M;a++)for(let b=0;b<M;b++)for(let k=0;k<cols;k++)
-      GHG[a][b]=C.add(GHG[a][b],C.mul(C.conj(G[k][a]),G[k][b]));
+    // Unit circle
+    ctx.strokeStyle=muted+'50'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.stroke();
 
-    function invCM(A){
-      const n=A.length;
-      const aug=A.map((row,i)=>row.map(v=>({...v})).concat(Array.from({length:n},(_,j)=>j===i?C.one():C.zero())));
-      for(let c=0;c<n;c++){
-        let pR=c;for(let r=c+1;r<n;r++)if(C.abs(aug[r][c])>C.abs(aug[pR][c]))pR=r;
-        [aug[c],aug[pR]]=[aug[pR],aug[c]];
-        const piv=aug[c][c],pd=C.abs2(piv);if(pd<1e-30)continue;
-        const pi={r:piv.r/pd,i:-piv.i/pd};
-        for(let j=0;j<2*n;j++)aug[c][j]=C.mul(aug[c][j],pi);
-        for(let r=0;r<n;r++){if(r===c)continue;const f=aug[r][c];for(let j=0;j<2*n;j++)aug[r][j]=C.sub(aug[r][j],C.mul(f,aug[c][j]));}
-      }
-      return aug.map(row=>row.slice(n));
+    const trueS=[...sourceAngles].sort((a,b)=>a-b);
+
+    // True DOA markers on unit circle (open rings)
+    trueS.forEach((deg,k)=>{
+      const sinT=Math.sin(deg*Math.PI/180);
+      const ang=Math.PI*sinT;
+      const rx=cx+R*Math.cos(ang), ry=cy+R*Math.sin(ang);
+      ctx.strokeStyle=SRC_COLORS[k%4]; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(rx,ry,8,0,2*Math.PI); ctx.stroke();
+      ctx.fillStyle=SRC_COLORS[k%4]; ctx.font='8px monospace'; ctx.textAlign='center';
+      ctx.fillText(`${deg>0?'+':''}${deg}°`, rx, ry+(Math.sin(ang)<0?-12:20));
+    });
+
+    if(!frame) return;
+    const {roots, sigRoots, estAngles, snap} = frame;
+
+    // ── DOA estimate tracks (history trail on unit circle) ──
+    // Draw the estimated DOA angle path for each source
+    if(history && history.length>1){
+      trueS.forEach((_,k)=>{
+        ctx.beginPath();
+        let started=false;
+        history.forEach((h,hi)=>{
+          if(!h.estAngles||k>=h.estAngles.length) return;
+          const deg=h.estAngles[k];
+          const sinT=Math.sin(deg*Math.PI/180);
+          const ang=Math.PI*sinT;
+          const rx=cx+R*Math.cos(ang), ry=cy+R*Math.sin(ang);
+          if(!started){ctx.moveTo(rx,ry);started=true;}
+          else ctx.lineTo(rx,ry);
+        });
+        ctx.strokeStyle=SRC_COLORS[k%4]+'40';
+        ctx.lineWidth=1.5; ctx.stroke();
+      });
     }
-    const GHG_inv=invCM(GHG);
-    const G_hash=Array.from({length:M},(_,a)=>Array.from({length:cols},(_,k)=>
-      Array.from({length:M}).reduce((acc,_,b)=>C.add(acc,C.mul(GHG_inv[a][b],C.conj(G[k][b]))),C.zero())
-    ));
 
-    function randn(){const u=Math.random()+1e-10,v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
-    function randcn(){return{r:randn()/Math.SQRT2,i:randn()/Math.SQRT2};}
-
-    // MSE accumulator [snapshots]
-    const mseAcc=new Float64Array(snapshots).fill(0);
-    let trial=0;
-
-    function runBatch(){
-      const BATCH=25; // trials per timeout chunk
-      const end=Math.min(trial+BATCH, MC);
-      for(;trial<end;trial++){
-        let W=Array.from({length:M-1},()=>C.zero());
-        for(let snap=0;snap<snapshots;snap++){
-          const srcs=Array.from({length:numSources},()=>randcn());
-          const x=sensors.map(s=>{
-            let v=C.zero();
-            phiSrcs.forEach((phi,j)=>v=C.add(v,C.mul(C.exp(0,Math.PI/2*Math.sin(s.theta)*Math.cos(phi-s.phi)),srcs[j])));
-            return C.add(v,C.scale(randcn(),noise_std));
-          });
-          const Dnm=eta.map(row=>row.reduce((acc,e,i)=>C.add(acc,C.mul(e,x[i])),C.zero()));
-          const z=G_hash.map(row=>row.reduce((acc,g,k)=>C.add(acc,C.mul(g,Dnm[k])),C.zero()));
-          const inp=z.slice(1);
-          let y=C.zero();W.forEach((w,k)=>y=C.add(y,C.mul(w,inp[k])));
-          const e=C.sub(z[0],y);
-          const pow=inp.reduce((s,v)=>s+C.abs2(v),0)+1e-8;
-          mseAcc[snap]+=C.abs2(e);
-          W=W.map((w,k)=>C.add(w,C.scale(C.mul(C.conj(inp[k]),e),mu/pow)));
-        }
-      }
-      onProgress(Math.round(trial/MC*100));
-      if(trial<MC){
-        setTimeout(runBatch,0);
-      } else {
-        const mseCurve=Array.from(mseAcc).map(v=>v/MC);
-        onDone(mseCurve);
-      }
+    // ── All roots — show actual positions in complex plane ──
+    // Scale: unit circle at radius R, so roots near origin appear near centre
+    if(roots){
+      const sigSet=new Set(sigRoots);
+      roots.forEach(r=>{
+        if(sigSet.has(r)) return;
+        const rx=cx+r.r*R, ry=cy+r.i*R;
+        if(rx<0||rx>W||ry<0||ry>H) return;
+        ctx.beginPath(); ctx.arc(rx,ry,1.8,0,2*Math.PI);
+        ctx.fillStyle=ink+'33'; ctx.fill();
+      });
     }
-    setTimeout(runBatch,0);
+
+    // ── Signal roots — colored, showing their movement toward unit circle ──
+    if(sigRoots){
+      sigRoots.forEach((r,k)=>{
+        const rx=cx+r.r*R, ry=cy+r.i*R;
+        if(rx<-20||rx>W+20||ry<-20||ry>H+20) return;
+        const absR=Math.sqrt(r.r*r.r+r.i*r.i);
+        // Draw line from current root to its projection on unit circle
+        const ang=Math.atan2(r.i,r.r);
+        const projX=cx+R*Math.cos(ang), projY=cy+R*Math.sin(ang);
+        ctx.strokeStyle=SRC_COLORS[k%4]+'33'; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(rx,ry); ctx.lineTo(projX,projY); ctx.stroke();
+        // Root dot
+        const glow=ctx.createRadialGradient(rx,ry,0,rx,ry,8);
+        glow.addColorStop(0,SRC_COLORS[k%4]+'55'); glow.addColorStop(1,SRC_COLORS[k%4]+'00');
+        ctx.beginPath(); ctx.arc(rx,ry,8,0,2*Math.PI); ctx.fillStyle=glow; ctx.fill();
+        ctx.beginPath(); ctx.arc(rx,ry,3,0,2*Math.PI);
+        ctx.fillStyle=SRC_COLORS[k%4]; ctx.fill();
+      });
+    }
+
+    // ── Estimated DOA on unit circle — filled diamond ──
+    if(estAngles){
+      estAngles.forEach((deg,k)=>{
+        const sinT=Math.sin(deg*Math.PI/180);
+        const ang=Math.PI*sinT;
+        const rx=cx+R*Math.cos(ang), ry=cy+R*Math.sin(ang);
+        ctx.fillStyle=SRC_COLORS[k%4];
+        ctx.beginPath();
+        ctx.moveTo(rx,ry-7); ctx.lineTo(rx+6,ry); ctx.lineTo(rx,ry+7); ctx.lineTo(rx-6,ry);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle=SRC_COLORS[k%4]+'cc'; ctx.font='bold 8px monospace'; ctx.textAlign='center';
+        ctx.fillText(`${deg.toFixed(0)}°`, rx+(Math.cos(ang)>0?16:-16), ry+3);
+      });
+    }
+
+    // Snapshot counter — top right
+    ctx.fillStyle=muted; ctx.font='bold 10px monospace'; ctx.textAlign='right';
+    ctx.fillText(`n = ${snap}`, W-6, 16);
+
+    // Legend
+    ctx.font='8px monospace'; ctx.textAlign='left';
+    ctx.strokeStyle=ink+'88'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(9,H-28,5,0,2*Math.PI); ctx.stroke();
+    ctx.fillStyle=muted; ctx.fillText('True DOA',18,H-24);
+    ctx.fillStyle=SRC_COLORS[0];
+    ctx.beginPath(); ctx.moveTo(9,H-18); ctx.lineTo(14,H-13); ctx.lineTo(9,H-8); ctx.lineTo(4,H-13); ctx.closePath(); ctx.fill();
+    ctx.fillStyle=muted; ctx.fillText('Estimated',18,H-11);
   }
 
-  // ── UI wiring ────────────────────────────────────────────────────────────
+  // ── PLAYBACK ANIMATION ────────────────────────────────────────────────────────
+  let playbackId=null;
+  function playAnimation(result){
+    if(playbackId) cancelAnimationFrame(playbackId);
+    const {errCurve, wHistory, K, sourceAngles} = result;
+    const dB=errCurve.map(v=>v<1e-20?-200:10*Math.log10(v));
+    const dBmax=Math.max(...dB.filter(isFinite))+3;
+    const dBmin=Math.min(...dB.filter(isFinite))-3;
+    const mseCv=document.getElementById('cv-mse');
+    const rootAnimCv=document.getElementById('cv-roots-anim');
+    const statusEl=document.getElementById('anim-status');
+    const nF=wHistory.length;
+    let fi=0;
+    const FPS=4, MS_PER_FRAME=1000/FPS; // very slow — ~250ms per frame
+    let lastTime=0;
+    function tick(ts){
+      if(ts-lastTime<MS_PER_FRAME){playbackId=requestAnimationFrame(tick);return;}
+      lastTime=ts;
+      const frame=wHistory[fi];
+      const upTo=frame.snap;
+      drawMSEFrame(mseCv, errCurve, dBmin, dBmax, upTo);
+      drawRootFrame(rootAnimCv, frame, K, sourceAngles, wHistory.slice(0, fi+1));
+      if(statusEl) statusEl.textContent=`n=${upTo}`;
+      fi++;
+      if(fi<nF) playbackId=requestAnimationFrame(tick);
+      else{
+        if(statusEl) statusEl.textContent='replaying…';
+        setTimeout(()=>{ fi=0; lastTime=0; playbackId=requestAnimationFrame(tick); }, 2200);
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+
+
   (function(){
-    const sliders = [
-      { id:'inp-sources', valId:'val-sources', fmt: v=>v },
-      { id:'inp-mics',    valId:'val-mics',    fmt: v=>v },
-      { id:'inp-step',    valId:'val-step',    fmt: v=>(v/1000).toFixed(3) },
-      { id:'inp-snr',     valId:'val-snr',     fmt: v=>v },
-      { id:'inp-iter',    valId:'val-iter',    fmt: v=>v },
+    // Slider bindings
+    const sliders=[
+      {id:'inp-M',   valId:'val-M',    fmt:v=>v},
+      {id:'inp-K',   valId:'val-K',    fmt:v=>v},
+      {id:'inp-snaps',valId:'val-snaps',fmt:v=>v},
+      {id:'inp-mu',  valId:'val-mu',   fmt:v=>(v*0.0005).toFixed(4)},
+      {id:'inp-snr', valId:'val-snr',  fmt:v=>v},
     ];
     sliders.forEach(({id,valId,fmt})=>{
       const el=document.getElementById(id), vEl=document.getElementById(valId);
       if(!el||!vEl) return;
-      el.addEventListener('input',()=>{ vEl.textContent=fmt(el.value); updateSourceInputs(); });
+      el.addEventListener('input',()=>{
+        vEl.textContent=fmt(el.value);
+        updateSourceInputs();
+        const arrCanvas=document.getElementById('cv-array');
+        if(arrCanvas) startULAAnimation(arrCanvas, parseInt(document.getElementById('inp-M').value), getSourceAngles());
+      });
     });
 
+    function getSourceAngles(){
+      const K=parseInt(document.getElementById('inp-K').value);
+      return Array.from({length:K},(_,k)=>parseFloat(document.getElementById(`src-az-${k}`)?.value||0));
+    }
+
     function updateSourceInputs(){
-      const n=parseInt(document.getElementById('inp-sources').value);
-      const container=document.getElementById('doa-source-inputs');
-      container.innerHTML='';
-      const label=document.createElement('div');
-      label.style.cssText='font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:0.6rem;';
-      label.textContent='Source Azimuths (°)';
-      container.appendChild(label);
-      const defaults=[60,150,240,330];
-      for(let k=0;k<n;k++){
-        const row=document.createElement('div'); row.className='source-row';
-        row.innerHTML=`<label>S${k+1}</label><input type="number" id="src-az-${k}" value="${defaults[k]}" min="0" max="359" step="1">`;
-        container.appendChild(row);
+      const K=parseInt(document.getElementById('inp-K').value);
+      for(let k=0;k<4;k++){
+        const row=document.getElementById(`src-row-${k}`);
+        if(row) row.style.display=k<K?'flex':'none';
       }
     }
     updateSourceInputs();
 
-    // Initial 3D array draw
+    // Draw static ULA immediately
     const arrCanvas=document.getElementById('cv-array');
-    if(arrCanvas){
-      const sensors=buildSensorPositions(6);
-      let rot=0;
-      function animateArray(){
-        Date._doaRot=rot; rot+=0.008;
-        drawArray3D(arrCanvas,sensors,[60,150]);
-        requestAnimationFrame(animateArray);
-      }
-      animateArray();
+    if(arrCanvas) startULAAnimation(arrCanvas,12,[0,40,60]);
+
+    // Source angle inputs → redraw ULA
+    for(let k=0;k<4;k++){
+      const inp=document.getElementById(`src-az-${k}`);
+      if(inp) inp.addEventListener('input',()=>{
+        if(arrCanvas) startULAAnimation(arrCanvas,parseInt(document.getElementById('inp-M').value),getSourceAngles());
+      });
     }
 
+    // Run button
     document.getElementById('doa-run').addEventListener('click',()=>{
       const btn=document.getElementById('doa-run');
-      btn.disabled=true; btn.textContent='Running…';
-
+      btn.disabled=true; btn.textContent='Running\u2026';
       setTimeout(()=>{
-        const n=parseInt(document.getElementById('inp-sources').value);
-        const mics=parseInt(document.getElementById('inp-mics').value);
-        const mu=parseFloat(document.getElementById('inp-step').value)/1000;
-        const snr=parseInt(document.getElementById('inp-snr').value);
-        const iter=parseInt(document.getElementById('inp-iter').value);
-        const sourceAngles=Array.from({length:n},(_,k)=>parseFloat(document.getElementById(`src-az-${k}`)?.value||60));
+        const M=parseInt(document.getElementById('inp-M').value);
+        const K=parseInt(document.getElementById('inp-K').value);
+        const snapshots=parseInt(document.getElementById('inp-snaps').value);
+        const mu=parseFloat(document.getElementById('inp-mu').value)*0.0005;
+        const snrDb=parseInt(document.getElementById('inp-snr').value);
+        const sourceAngles=getSourceAngles();
 
-        const result=runDOA({ numSources:n, micsPerRing:mics, mu, snrDb:snr, snapshots:iter, sourceAngles });
+        const result=runDOA({M,K,snapshots,mu,snrDb,sourceAngles});
 
-        // Results panel
+        // Results table
         const resDiv=document.getElementById('doa-results');
         resDiv.innerHTML='';
-        result.thetaEst.forEach((est,k)=>{
-          const err=Math.abs(est-result.trueAngles[k]).toFixed(1);
+        const trueS=[...sourceAngles].sort((a,b)=>a-b);
+        result.thetaEstDeg.forEach((est,k)=>{
+          const err=(est-trueS[k]).toFixed(1);
           resDiv.innerHTML+=`
             <div class="result-row">
               <span class="result-label">Source ${k+1}</span>
-              <span class="result-val">${est.toFixed(1)}°</span>
+              <span class="result-val">${est.toFixed(1)}\xb0</span>
             </div>
             <div class="result-row" style="margin-top:-4px;border-bottom:none;">
-              <span class="result-label" style="font-size:0.55rem;">True: ${result.trueAngles[k].toFixed(1)}°</span>
-              <span style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);">err ${err}°</span>
+              <span class="result-label" style="font-size:0.55rem;">True: ${trueS[k].toFixed(1)}\xb0</span>
+              <span style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);">err ${err}\xb0</span>
             </div>`;
         });
         resDiv.innerHTML+=`<div class="result-row" style="margin-top:0.5rem;border-top:1px solid var(--rule);">
           <span class="result-label">RMSE</span>
-          <span class="result-val">${result.rmse.toFixed(2)}°</span>
+          <span class="result-val">${result.rmse.toFixed(2)}\xb0</span>
         </div>`;
 
-        // Update 3D array with new sensor count & source positions
-        const newSensors=buildSensorPositions(mics);
-        let rot2=0;
-        function animateArray2(){
-          Date._doaRot=rot2; rot2+=0.008;
-          drawArray3D(document.getElementById('cv-array'),newSensors,sourceAngles);
-          requestAnimationFrame(animateArray2);
-        }
-        animateArray2();
-
-        // Draw root plot
-        drawRootPlot(document.getElementById('cv-roots'), result.allRoots, result.sigRoots, result.trueAngles);
+        drawSpectrum(document.getElementById('cv-spectrum'),result.thetaGrid,result.spectrum,sourceAngles);
+        document.getElementById('spec-hint').style.display='none';
+        drawRootPlot(document.getElementById('cv-roots'),result.allRoots,result.sigRoots,sourceAngles);
         document.getElementById('roots-hint').style.display='none';
-
-        // Launch Monte Carlo async
-        document.getElementById('mse-hint').textContent='Running 500 Monte Carlo trials…';
-        document.getElementById('mc-status').textContent='';
-        runMonteCarlo({ numSources:n, micsPerRing:mics, mu, snrDb:snr, snapshots:iter, sourceAngles },
-          (progress)=>{ document.getElementById('mc-status').textContent=`${progress}%`; },
-          (mseCurve)=>{ drawMSE(document.getElementById('cv-mse'), mseCurve, iter);
-                        document.getElementById('mse-hint').style.display='none';
-                        document.getElementById('mc-status').textContent='done'; }
-        );
+        document.getElementById('mse-hint').style.display='none';
+        document.getElementById('roots-anim-hint').style.display='none';
+        playAnimation(result);
+        startULAAnimation(document.getElementById('cv-array'),M,sourceAngles);
 
         btn.disabled=false; btn.textContent='Run Estimator';
-      }, 30);
+      },30);
     });
   })();
   </script>
